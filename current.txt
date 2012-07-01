@@ -1,0 +1,38 @@
+Sign type ideas: 
+ 
+PricePreview 
+Show's what a permit will cost
+Usage: Outside a "Temple of doom" to avoid players getting to the end.. and not having enough money!
+ 
+Sale
+Shows what a permit will cost, allows player to buy permit
+Usage: Player right clicks sign, buys permit
+ 
+Role
+Shows permit name, and number remaining. Number is a count down
+Usage: Arena's, for classes etc.
+ 
+Monitor
+Shows the number of people with the given permit
+Usage: Arena spectator area, mod room etc.
+ 
+ 
+ 
+Sign names:
+Config should have options for what each sign type is called (top label, eg [Knowledge] vs [Sale])
+ 
+Sign data:
+Signs are tied to a permit alias in the backend. (So they don't need to be location aware for operation, but
+  will need to be for setup)
+  
+Sign creation:
+Ideally, a command "/permitme sign create alias [worldguard alias]" and punch the sign
+To help, "/permitme sign location [most of alias]" then "/permitme sign create id [uid]"
+
+Pricing for sales signs:
+Have a wide range of pricing methods, and multiple pricing methods can be active on one sign.
+Have a min, max and base price.
+Pricing decay means a drop over time, using a "every minute" function, can be set amount, or ratio
+Pricing should have a rounding factor - use "multiple of x" (eg 100, 25, or .5) and only update when this changes
+Pricing factor means an increase in price whenever a player purchases this permit (from anywhere) - tracked with seperate "factor Price"
+pricing ratio (can be many) means this may raise or lower in price depending on the raio of this permit to another
