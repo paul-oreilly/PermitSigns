@@ -26,6 +26,7 @@ public class PlayerTracker {
 	public void permitMeReady() {
 		// Called when PermitMe has loaded, so we can get a count of online
 		// players
+		PermitMe.log.info( "[PermitSigns] Linking with PermitMe" );
 		HashMap< String, HashSet< PermitPlayer >> data = PermitMe.instance.players.getAllPlayerCountsByPermit();
 		for ( String permitName : data.keySet() ) {
 			HashSet< PermitPlayer > players = data.get( permitName );
@@ -54,6 +55,7 @@ public class PlayerTracker {
 			permitCountByOnlinePlayers.put( permitAlias, 1 );
 		else
 			permitCountByOnlinePlayers.put( permitAlias, count + 1 );
+		PermitSigns.instance.signs.updateMonitorSignsFor( permitAlias );
 	}
 	
 	
@@ -62,6 +64,7 @@ public class PlayerTracker {
 		if ( count != null )
 			if ( count > 0 )
 				permitCountByOnlinePlayers.put( permitAlias, count - 1 );
+		PermitSigns.instance.signs.updateMonitorSignsFor( permitAlias );
 	}
 	
 	

@@ -1,0 +1,18 @@
+main: com.oreilly.permitsigns.PermitSigns
+author: oreillynz
+name: PermitSigns
+version: 0.1
+depend: [Vault, PermitMe]
+
+commands:
+    permitsigns:
+        discription: Admin functions
+        usage: use /permitsigns ? for help
+
+permissions:
+    permitsigns.sign.edit:
+        discription: Required to create or edit these signs
+        default: op
+
+
+

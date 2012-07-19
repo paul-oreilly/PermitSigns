@@ -1,6 +1,5 @@
 package com.oreilly.permitsigns;
 
-import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
@@ -16,10 +15,10 @@ import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 
-import com.oreilly.permitme.PermitMe;
 import com.oreilly.permitme.events.PermitMeEnableCompleteEvent;
 import com.oreilly.permitme.events.PermitMePlayerAddPermitEvent;
 import com.oreilly.permitme.events.PermitMePlayerRemovePermitEvent;
+import com.oreilly.permitsigns.events.PermitSignsPriceChangeEvent;
 
 
 public class Events implements Listener {
@@ -60,19 +59,23 @@ public class Events implements Listener {
 		Player player = event.getPlayer();
 		Action action = event.getAction();
 		Block block = event.getClickedBlock();
-		Location blocklocation = block.getLocation();
+		// Location blocklocation = block.getLocation();
 		// see if block is a sign
-		if ( block instanceof Sign ) {
+		if ( block.getState() instanceof Sign ) {
+			// DEBUG:
 			// a left click on a sign will refresh it
 			if ( action == Action.LEFT_CLICK_BLOCK )
-				PermitSigns.instance.signs.refresh( block );
+				PermitSigns.instance.signs.leftClicked( player, block.getState() );
+			// PermitSigns.instance.signs.refresh( block );
 			else if ( action == Action.RIGHT_CLICK_BLOCK ) {
 				// a right click is "purchase", but is ignored if the player is
 				// exempt
 				// since we extend PermitMe, we use PermitMe's permission group
-				if ( PermitMe.instance.players.hasPermission( player, "exempt" ) )
-					return;
-				PermitSigns.instance.signs.playerPurchase( player, block );
+				// if ( PermitMe.instance.players.hasPermission( player,
+				// "exempt" ) )
+				// return;
+				// PermitSigns.instance.signs.playerPurchase( player, block );
+				PermitSigns.instance.signs.rightClicked( player, block.getState() );
 			}
 		}
 	}
@@ -112,7 +115,7 @@ public class Events implements Listener {
 	
 	@EventHandler
 	public void onPermitMeEnable( PermitMeEnableCompleteEvent event ) {
-		PermitSigns.instance.tracker.permitMeReady();
+		PermitSigns.instance.permitMeReady();
 	}
 	
 	
@@ -137,5 +140,14 @@ public class Events implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onChunkLoad( ChunkLoadEvent event ) {
 		PermitSigns.instance.signs.refresh( event.getChunk() );
+	}
+	
+	
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onPermitSignsPriceChange( PermitSignsPriceChangeEvent event ) {
+		if ( !event.isCancelled ) {
+			PermitSigns.instance.economy.priceChangeEventSuccess( event.economicData, event.newPrice );
+			PermitSigns.instance.signs.refresh( event.permitAlias );
+		}
 	}
 }

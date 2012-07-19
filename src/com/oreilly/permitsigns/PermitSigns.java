@@ -2,10 +2,17 @@ package com.oreilly.permitsigns;
 
 import net.milkbowl.vault.economy.Economy;
 
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.oreilly.common.interaction.text.Interaction;
+import com.oreilly.common.interaction.text.InteractionFactory;
+import com.oreilly.common.interaction.text.formatter.Border;
+import com.oreilly.common.interaction.text.formatter.ClearChat;
 import com.oreilly.permitme.PermitMe;
+import com.oreilly.permitsigns.interactions.AdminChoices;
 
 
 /**
@@ -23,35 +30,72 @@ public class PermitSigns extends JavaPlugin {
 	public com.oreilly.permitsigns.Economy economy = null;
 	public PlayerTracker tracker = null;
 	
+	protected InteractionFactory adminInteraction = null;
+	
 	public net.milkbowl.vault.economy.Economy vaultEconomy = null;
 	
 	
 	public PermitSigns() {
 		super();
-		CommandList.loadCommands();
+		Commands.loadCommands();
 		instance = this;
+		
 	}
 	
 	
 	@Override
 	public void onEnable() {
 		
+		PermitMe.log.info( "[PermitSigns] Enabling..." );
+		
 		signs = new Signs();
-		economy = new com.oreilly.permitsigns.Economy();
+		economy = new com.oreilly.permitsigns.Economy( this );
 		tracker = new PlayerTracker();
 		
 		Config.load();
 		
 		// register event listeners
 		getServer().getPluginManager().registerEvents( new Events(), this );
-		
-		// if permitMe is already loaded, call methods that would otherwise be
-		// waiting for it
-		if ( PermitMe.instance != null )
-			tracker.permitMeReady();
+		Interaction.registerEventListener( this );
 		
 		if ( setupEconomy() == false )
 			PermitMe.log.warning( "[PermitSigns] Vault economy setup has failed." );
+		
+		// setup interactions
+		signs.setupInteractions();
+		setupInteractions();
+		
+		// if permitMe is already loaded, call methods that would otherwise be
+		// waiting for it
+		// TODO: Put these into a function, and check there is an event that will cal them
+		if ( PermitMe.instance != null )
+			permitMeReady();
+		
+	}
+	
+	
+	public void permitMeReady() {
+		tracker.permitMeReady();
+		signs.refreshAllSigns();
+	}
+	
+	
+	@Override
+	public boolean onCommand( CommandSender sender, Command cmd, String commandLabel, String[] args ) {
+		return Commands.runCommand( sender, cmd, commandLabel, args );
+	}
+	
+	
+	protected void setupInteractions() {
+		adminInteraction = new InteractionFactory()
+				.withExitSequence( "quit", "exit" )
+				.withReturnSequence( "return" )
+				.withTimeout( 20 )
+				.thatExcludesNonPlayersWithMessage( "Only usable from within minecraft, by players" )
+				.withPages( new AdminChoices() )
+				.withFormatter( new Border() )
+				.withFormatter( new ClearChat() );
+		// TODO: Add styling
 	}
 	
 	
