@@ -22,7 +22,7 @@ public class Config {
 	// TODO: Example file creation
 	
 	static public File pluginRoot = null;
-	static public File economicDir = null;
+	static public File priceDir = null;
 	static public File signFolder = null;
 	static public File conf = null;
 	
@@ -33,11 +33,11 @@ public class Config {
 		// load main config
 		loadConfig();
 		
+		// load price data
+		loadPriceData();
+		
 		// load sign data
 		loadSigns();
-		
-		// load economic data
-		loadEconomicData();
 	}
 	
 	
@@ -71,8 +71,8 @@ public class Config {
 	}
 	
 	
-	public static void saveEconomicData( PriceRecord data ) {
-		File economicFile = new File( economicDir + File.separator + data.permitAlias );
+	public static void savePriceData( PriceRecord data ) {
+		File economicFile = new File( priceDir + File.separator + data.permitAlias + ".yml" );
 		YamlConfiguration config = loadYamlFile( economicFile );
 		data.saveToConfig( config, "economicData" );
 		try {
@@ -88,15 +88,13 @@ public class Config {
 	private static void loadFilePaths() {
 		pluginRoot = PermitSigns.instance.getDataFolder();
 		conf = new File( pluginRoot.getPath() + File.separator + "config.yml" );
-		economicDir = new File( pluginRoot.getPath() + File.separator + "pricing" );
+		priceDir = new File( pluginRoot.getPath() + File.separator + "pricing" );
 		signFolder = new File( pluginRoot.getPath() + File.separator + "signs" );
 	}
 	
 	
 	private static void loadConfig() {
 		// load sign header information
-		// DEBUG
-		PermitMe.log.info( "[PermitSigns] Loading main configuration file" );
 		FileConfiguration config = loadYamlFile( conf );
 		Signs signs = PermitSigns.instance.signs;
 		List< String > headerData = config.getStringList( ConfigConstant.signHeaders );
@@ -109,8 +107,6 @@ public class Config {
 				}
 		// provide default header's if none have been loaded
 		if ( signs.signHeaders.size() == 0 ) {
-			// DEBUG
-			PermitMe.log.warning( "[PermitSigns] Sign type information not found, adding defaults" );
 			signs.addHeader( "[permit]", SignType.SALE );
 			signs.addHeader( "[cost]", SignType.SALEPREVIEW );
 			signs.addHeader( "[monitor]", SignType.MONITOR );
@@ -134,7 +130,8 @@ public class Config {
 					}
 					YamlConfiguration config = loadYamlFile( file );
 					for ( String fileUID : config.getKeys( false ) ) {
-						SignRecord sign = SignRecord.fromConfigurationSection( config.getConfigurationSection( fileUID ), fileUID,
+						SignRecord sign = SignRecord.fromConfigurationSection(
+								config.getConfigurationSection( fileUID ), fileUID,
 								file.getAbsolutePath() );
 						if ( sign != null )
 							PermitSigns.instance.signs.registerSign( sign );
@@ -144,12 +141,12 @@ public class Config {
 	}
 	
 	
-	private static void loadEconomicData() {
-		// economic data is saved by permitAlias in economic file
-		if ( !economicDir.exists() )
-			economicDir.mkdirs();
+	private static void loadPriceData() {
+		// pricing is saved by permitAlias in pricing directory
+		if ( !priceDir.exists() )
+			priceDir.mkdirs();
 		else {
-			File[] files = economicDir.listFiles();
+			File[] files = priceDir.listFiles();
 			if ( files != null )
 				for ( File file : files ) {
 					if ( !file.getName().endsWith( ".yml" ) )
@@ -161,8 +158,9 @@ public class Config {
 					YamlConfiguration config = loadYamlFile( file );
 					PriceRecord data = PriceRecord.fromConfigurationSection(
 							config.getConfigurationSection( "economicData" ), file.getAbsoluteFile().getAbsolutePath() );
-					if ( data != null )
+					if ( data != null ) {
 						PermitSigns.instance.prices.addEconomicData( data );
+					}
 				}
 		}
 	}

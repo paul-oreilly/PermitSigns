@@ -239,7 +239,7 @@ public class Prices {
 		if ( data == null ) {
 			data = new PriceRecord( permitAlias, 10000 );
 			economicData.put( permitAlias, data );
-			Config.saveEconomicData( data );
+			Config.savePriceData( data );
 		}
 		return updatePrice( data );
 	}
@@ -278,7 +278,7 @@ public class Prices {
 		data.currentPrice = newPrice;
 		permitPrices.put( data.permitAlias, newPrice );
 		// save the record
-		Config.saveEconomicData( data );
+		Config.savePriceData( data );
 		// invalidate cache's
 		permitPricesAsStrings.remove( data.permitAlias );
 	}

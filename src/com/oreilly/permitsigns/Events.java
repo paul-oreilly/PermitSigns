@@ -62,19 +62,10 @@ public class Events implements Listener {
 		// Location blocklocation = block.getLocation();
 		// see if block is a sign
 		if ( block.getState() instanceof Sign ) {
-			// DEBUG:
 			// a left click on a sign will refresh it
 			if ( action == Action.LEFT_CLICK_BLOCK )
 				PermitSigns.instance.signs.leftClicked( player, block.getState() );
-			// PermitSigns.instance.signs.refresh( block );
 			else if ( action == Action.RIGHT_CLICK_BLOCK ) {
-				// a right click is "purchase", but is ignored if the player is
-				// exempt
-				// since we extend PermitMe, we use PermitMe's permission group
-				// if ( PermitMe.instance.players.hasPermission( player,
-				// "exempt" ) )
-				// return;
-				// PermitSigns.instance.signs.playerPurchase( player, block );
 				PermitSigns.instance.signs.rightClicked( player, block.getState() );
 			}
 		}

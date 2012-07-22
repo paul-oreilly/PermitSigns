@@ -303,7 +303,6 @@ public class Signs {
 	
 	
 	public void refreshAllSigns() {
-		PermitMe.log.info( "[PermitSigns] DEBUG: Refreshing all sign data" );
 		for ( LinkedList< SignRecord > list : signsByWorld.values() )
 			for ( SignRecord sign : list )
 				refresh( sign );
@@ -345,8 +344,6 @@ public class Signs {
 	
 	public void refresh( String permitAlias ) {
 		SignList list = signsByPermitAlias.get( permitAlias );
-		// DEBUG:
-		PermitMe.log.info( "[PermitSigns] DEBUG: Sign refesh by alias called for " + permitAlias );
 		if ( list != null )
 			for ( SignRecord sign : list )
 				refresh( sign );
@@ -363,8 +360,6 @@ public class Signs {
 					sign.toHumanString() );
 			return;
 		}
-		// DEBUG:
-		PermitMe.log.info( "[PermitSigns] DEBUG: Refeshing sign:\n" + sign.toHumanString() );
 		Block block = sign.location.getBlock();
 		BlockState blockState = block.getState();
 		if ( blockState instanceof org.bukkit.block.Sign ) {

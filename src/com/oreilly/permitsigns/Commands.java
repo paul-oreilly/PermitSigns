@@ -56,8 +56,6 @@ class ActivateEditSignMode extends Commands {
 	
 	@Override
 	public boolean run( CommandSender sender, Command cmd, String commandLabel, String[] data ) {
-		// DEBUG:
-		sender.sendMessage( "DEBUG: Activation request" );
 		if ( !standardPermissionCheck( sender, "permitsigns.signs.edit" ) )
 			return false;
 		PermitSigns.instance.signs.activateSignEditingFor( sender );
