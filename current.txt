@@ -1,3 +1,13 @@
+Current work
+
+- Finish interactions for altering economic data (AdminChoices interaction)
+- Test economic system - do signs update right, alter on purcahse etc, and are permits granted correctly?
+- Make sure buying works, and re-export PermitMe to fix permit save bug.
+
+
+
+
+
 Sign type ideas: 
  
 PricePreview 
@@ -17,17 +27,7 @@ Shows the number of people with the given permit
 Usage: Arena spectator area, mod room etc.
  
  
- 
-Sign names:
-Config should have options for what each sign type is called (top label, eg [Knowledge] vs [Sale])
- 
-Sign data:
-Signs are tied to a permit alias in the backend. (So they don't need to be location aware for operation, but
-  will need to be for setup)
-  
-Sign creation:
-Ideally, a command "/permitme sign create alias [worldguard alias]" and punch the sign
-To help, "/permitme sign location [most of alias]" then "/permitme sign create id [uid]"
+
 
 Pricing for sales signs:
 Have a wide range of pricing methods, and multiple pricing methods can be active on one sign.

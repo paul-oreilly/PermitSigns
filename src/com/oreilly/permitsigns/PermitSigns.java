@@ -2,6 +2,7 @@ package com.oreilly.permitsigns;
 
 import net.milkbowl.vault.economy.Economy;
 
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -11,6 +12,7 @@ import com.oreilly.common.interaction.text.Interaction;
 import com.oreilly.common.interaction.text.InteractionFactory;
 import com.oreilly.common.interaction.text.formatter.Border;
 import com.oreilly.common.interaction.text.formatter.ClearChat;
+import com.oreilly.common.interaction.text.formatter.Highlighter;
 import com.oreilly.permitme.PermitMe;
 import com.oreilly.permitsigns.interactions.AdminChoices;
 
@@ -94,8 +96,11 @@ public class PermitSigns extends JavaPlugin {
 				.thatExcludesNonPlayersWithMessage( "Only usable from within minecraft, by players" )
 				.withPages( new AdminChoices() )
 				.withFormatter( new Border() )
-				.withFormatter( new ClearChat() );
-		// TODO: Add styling
+				.withFormatter( new ClearChat() )
+				.withStyle( Highlighter.PLAYER_CHOICES, ChatColor.GREEN )
+				.withStyle( Border.COLOR_TITLE_TEXT, ChatColor.GOLD )
+				.withStyle( Border.COLOR_TITLE_BORDER, ChatColor.DARK_RED )
+				.withStyle( Border.COLOR_TEXT_BORDER, ChatColor.BLUE );
 	}
 	
 	

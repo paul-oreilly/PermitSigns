@@ -4,6 +4,12 @@ import com.oreilly.common.interaction.text.Interaction;
 import com.oreilly.common.interaction.text.interfaces.HasTitle;
 import com.oreilly.common.interaction.text.pages.MenuPage;
 import com.oreilly.permitsigns.PermitSigns;
+import com.oreilly.permitsigns.interactions.pricing.EditBasePrice;
+import com.oreilly.permitsigns.interactions.pricing.EditMaxPrice;
+import com.oreilly.permitsigns.interactions.pricing.EditMinPrice;
+import com.oreilly.permitsigns.interactions.pricing.EditRatioPricing;
+import com.oreilly.permitsigns.interactions.pricing.EditRounding;
+import com.oreilly.permitsigns.interactions.pricing.EditVariablePricing;
 import com.oreilly.permitsigns.records.EconomicData;
 
 
@@ -11,13 +17,32 @@ public class EditEconomicData extends MenuPage implements HasTitle {
 	
 	public EditEconomicData() {
 		super();
+		withChoice( "base", new EditBasePrice() );
+		withAlias( "base", "1" );
+		withChoice( "minimum", new EditMinPrice() );
+		withAlias( "minimum", "min" );
+		withAlias( "minimum", "2" );
+		withChoice( "maximum", new EditMaxPrice() );
+		withAlias( "maximum", "max" );
+		withAlias( "maximum", "3" );
+		withChoice( "rounding", new EditRounding() );
+		withAlias( "rounding", "4" );
+		withAlias( "rounding", "round" );
+		withChoice( "variable", new EditVariablePricing() );
+		withAlias( "variable", "var" );
+		withAlias( "variable", "v" );
+		withAlias( "variable", "5" );
+		withChoice( "ratio", new EditRatioPricing() );
+		withAlias( "ratio", "r" );
+		withAlias( "ratio", "6" );
+		validationFailedMessage = "Please type one of the highlighted options to proceed";
 	}
 	
 	
 	@Override
 	public String getTitle() {
 		// TODO Auto-generated method stub
-		return "PermitSigns Economic Editing Assistant";
+		return "Sign Price Editing Assistant";
 	}
 	
 	
@@ -28,11 +53,14 @@ public class EditEconomicData extends MenuPage implements HasTitle {
 			String permitAlias = permitAliasObj.toString();
 			EconomicData economicData = PermitSigns.instance.economy.getEconomicData( permitAlias );
 			if ( economicData != null ) {
-				return "Economic data for " + permitAlias + ":\n\n" +
-						economicData.toHumanString( false, "" ) + "\n\n" +
-						"Please select an option to edit (or exit to quit)\n";
-				// TODO: Continue...
-				
+				return "Currently editing prices for " + permitAlias + ":\n\n" +
+						"Please select an option to edit (or exit to quit)\n" +
+						"1. Base price\n" +
+						"2. Minimum price\n" +
+						"3. Maximum price\n" +
+						"4. Rounding factor\n" +
+						"5. Variable price settings\n" +
+						"6. Ratio price settings";
 			} else
 				return "No matching economic data found for " + permitAlias;
 		}

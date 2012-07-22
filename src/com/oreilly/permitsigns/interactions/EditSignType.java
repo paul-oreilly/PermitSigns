@@ -73,7 +73,7 @@ public class EditSignType extends InteractionPage implements HasTitle, Highlight
 	@Override
 	public HashMap< String, Iterator< String >> getHighlightList() {
 		HashMap< String, Iterator< String >> result = new HashMap< String, Iterator< String >>();
-		result.put( InteractionPage.STYLE_PLAYER_CHOICES, PermitSigns.instance.signs.signHeaders.keySet().iterator() );
+		result.put( Highlighter.PLAYER_CHOICES, PermitSigns.instance.signs.signHeaders.keySet().iterator() );
 		return result;
 	}
 }

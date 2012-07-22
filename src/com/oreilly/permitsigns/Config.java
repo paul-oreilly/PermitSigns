@@ -66,7 +66,7 @@ public class Config {
 		try {
 			config.save( source );
 		} catch ( IOException e ) {
-			PermitMe.log.warning( "[PermitMe] !! IO Exception while saving permit " +
+			PermitMe.log.warning( "[PermitSigns] !! IO Exception while saving sign " +
 					source.getName() + " to " + source.getPath() );
 			e.printStackTrace();
 		}
@@ -77,6 +77,13 @@ public class Config {
 		File economicFile = new File( economicDir + File.separator + data.permitAlias );
 		YamlConfiguration config = loadYamlFile( economicFile );
 		data.saveToConfig( config, "economicData" );
+		try {
+			config.save( economicFile );
+		} catch ( IOException e ) {
+			PermitMe.log.warning( "[PermitSigns] !! IO Exception while saving economic data " +
+					data.permitAlias );
+			e.printStackTrace();
+		}
 	}
 	
 	

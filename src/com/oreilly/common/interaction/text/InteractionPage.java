@@ -8,8 +8,7 @@ import com.oreilly.common.interaction.text.validator.Validator;
 
 abstract public class InteractionPage {
 	
-	static public final String STYLE_TEXT_COLOR = "textColor";
-	static public final String STYLE_PLAYER_CHOICES = "playerChoices";
+	static public final int MAX_LINES = 40;
 	
 	public Formatter formatter = null;
 	public Validator validator = null;
@@ -71,5 +70,25 @@ abstract public class InteractionPage {
 	public InteractionPage withStyle( String key, Object style ) {
 		this.style.put( key, style );
 		return this;
+	}
+	
+	
+	public InteractionPage withStyles( HashMap< String, Object > source ) {
+		style.putAll( source );
+		return this;
+	}
+	
+	
+	// Helper functions...
+	
+	@SuppressWarnings("unchecked")
+	public < T > T getContextData( Class< T > tClass, Interaction interaction, String key ) {
+		Object obj = interaction.context.get( key );
+		if ( obj == null )
+			return null;
+		if ( obj.getClass().isAssignableFrom( tClass ) )
+			return (T)obj;
+		else
+			return null;
 	}
 }
