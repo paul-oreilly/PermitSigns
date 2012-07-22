@@ -3,6 +3,7 @@ package com.oreilly.permitsigns.interactions;
 import com.oreilly.common.interaction.text.Interaction;
 import com.oreilly.common.interaction.text.interfaces.HasTitle;
 import com.oreilly.common.interaction.text.pages.MenuPage;
+import com.oreilly.permitsigns.PriceRecord;
 import com.oreilly.permitsigns.PermitSigns;
 import com.oreilly.permitsigns.interactions.pricing.EditBasePrice;
 import com.oreilly.permitsigns.interactions.pricing.EditMaxPrice;
@@ -10,7 +11,6 @@ import com.oreilly.permitsigns.interactions.pricing.EditMinPrice;
 import com.oreilly.permitsigns.interactions.pricing.EditRatioPricing;
 import com.oreilly.permitsigns.interactions.pricing.EditRounding;
 import com.oreilly.permitsigns.interactions.pricing.EditVariablePricing;
-import com.oreilly.permitsigns.records.EconomicData;
 
 
 public class EditEconomicData extends MenuPage implements HasTitle {
@@ -51,7 +51,7 @@ public class EditEconomicData extends MenuPage implements HasTitle {
 		Object permitAliasObj = interaction.context.get( SelectPermitAlias.CONTEXT_SELECTED_ALIAS );
 		if ( permitAliasObj != null ) {
 			String permitAlias = permitAliasObj.toString();
-			EconomicData economicData = PermitSigns.instance.economy.getEconomicData( permitAlias );
+			PriceRecord economicData = PermitSigns.instance.prices.getPriceRecord( permitAlias );
 			if ( economicData != null ) {
 				return "Currently editing prices for " + permitAlias + ":\n\n" +
 						"Please select an option to edit (or exit to quit)\n" +

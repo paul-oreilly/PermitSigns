@@ -3,8 +3,8 @@ package com.oreilly.permitsigns.interactions;
 import com.oreilly.common.interaction.text.Interaction;
 import com.oreilly.common.interaction.text.InteractionPage;
 import com.oreilly.common.interaction.text.interfaces.HasTitle;
+import com.oreilly.permitsigns.PriceRecord;
 import com.oreilly.permitsigns.PermitSigns;
-import com.oreilly.permitsigns.records.EconomicData;
 
 
 // TODO: Highlight the "Page x of y"
@@ -73,7 +73,7 @@ public class ViewEconomicData extends InteractionPage implements HasTitle {
 		Object permitAliasObj = interaction.context.get( SelectPermitAlias.CONTEXT_SELECTED_ALIAS );
 		if ( permitAliasObj != null ) {
 			String permitAlias = permitAliasObj.toString();
-			EconomicData economicData = PermitSigns.instance.economy.getEconomicData( permitAlias );
+			PriceRecord economicData = PermitSigns.instance.prices.getPriceRecord( permitAlias );
 			if ( economicData != null ) {
 				return economicData.toHumanString();
 			} else

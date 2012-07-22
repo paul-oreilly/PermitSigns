@@ -12,8 +12,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import com.oreilly.permitme.PermitMe;
 import com.oreilly.permitsigns.data.SignHeader;
 import com.oreilly.permitsigns.data.SignType;
-import com.oreilly.permitsigns.records.EconomicData;
-import com.oreilly.permitsigns.records.Sign;
 
 
 public class Config {
@@ -43,15 +41,15 @@ public class Config {
 	}
 	
 	
-	public static void saveSign( Sign sign ) {
+	public static void saveSign( SignRecord sign ) {
 		// signs are saved as a list in "[worldname]_signs.yml"
 		String worldName = sign.location.getWorld().getName();
 		
 		File source = new File( signFolder + File.separator + worldName + "_signs.yml" );
 		YamlConfiguration config = loadYamlFile( source );
 		
-		List< Sign > signsInWorld = PermitSigns.instance.signs.getSignsInWorld( worldName );
-		for ( Sign subject : signsInWorld ) {
+		List< SignRecord > signsInWorld = PermitSigns.instance.signs.getSignsInWorld( worldName );
+		for ( SignRecord subject : signsInWorld ) {
 			String key = null;
 			if ( sign.fileUID != null )
 				if ( sign.fileUID.length() > 0 )
@@ -73,7 +71,7 @@ public class Config {
 	}
 	
 	
-	public static void saveEconomicData( EconomicData data ) {
+	public static void saveEconomicData( PriceRecord data ) {
 		File economicFile = new File( economicDir + File.separator + data.permitAlias );
 		YamlConfiguration config = loadYamlFile( economicFile );
 		data.saveToConfig( config, "economicData" );
@@ -136,7 +134,7 @@ public class Config {
 					}
 					YamlConfiguration config = loadYamlFile( file );
 					for ( String fileUID : config.getKeys( false ) ) {
-						Sign sign = Sign.fromConfigurationSection( config.getConfigurationSection( fileUID ), fileUID,
+						SignRecord sign = SignRecord.fromConfigurationSection( config.getConfigurationSection( fileUID ), fileUID,
 								file.getAbsolutePath() );
 						if ( sign != null )
 							PermitSigns.instance.signs.registerSign( sign );
@@ -161,10 +159,10 @@ public class Config {
 						continue;
 					}
 					YamlConfiguration config = loadYamlFile( file );
-					EconomicData data = EconomicData.fromConfigurationSection(
+					PriceRecord data = PriceRecord.fromConfigurationSection(
 							config.getConfigurationSection( "economicData" ), file.getAbsoluteFile().getAbsolutePath() );
 					if ( data != null )
-						PermitSigns.instance.economy.addEconomicData( data );
+						PermitSigns.instance.prices.addEconomicData( data );
 				}
 		}
 	}

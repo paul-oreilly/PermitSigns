@@ -98,7 +98,7 @@ public class Events implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPermitMePlayerAddPermit( PermitMePlayerAddPermitEvent event ) {
 		if ( event.allow ) {
-			PermitSigns.instance.economy.playerGainedPermit( event.permitPlayer, event.permitAlias );
+			PermitSigns.instance.prices.playerGainedPermit( event.permitPlayer, event.permitAlias );
 			PermitSigns.instance.tracker.playerGainedPermit( event.permitPlayer, event.permitAlias );
 		}
 	}
@@ -107,7 +107,7 @@ public class Events implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPermitMePlayerRemovePermit( PermitMePlayerRemovePermitEvent event ) {
 		if ( event.allow ) {
-			PermitSigns.instance.economy.playerLostPermit( event.permitPlayer, event.permitAlias );
+			PermitSigns.instance.prices.playerLostPermit( event.permitPlayer, event.permitAlias );
 			PermitSigns.instance.tracker.playerLostPermit( event.permitPlayer, event.permitAlias );
 		}
 	}
@@ -146,7 +146,7 @@ public class Events implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPermitSignsPriceChange( PermitSignsPriceChangeEvent event ) {
 		if ( !event.isCancelled ) {
-			PermitSigns.instance.economy.priceChangeEventSuccess( event.economicData, event.newPrice );
+			PermitSigns.instance.prices.priceChangeEventSuccess( event.economicData, event.newPrice );
 			PermitSigns.instance.signs.refresh( event.permitAlias );
 		}
 	}

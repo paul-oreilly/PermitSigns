@@ -3,8 +3,8 @@ package com.oreilly.permitsigns.events;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
+import com.oreilly.permitsigns.PriceRecord;
 import com.oreilly.permitsigns.PermitSigns;
-import com.oreilly.permitsigns.records.EconomicData;
 
 
 public class PermitSignsPriceChangeEvent extends Event {
@@ -12,7 +12,7 @@ public class PermitSignsPriceChangeEvent extends Event {
 	private static final HandlerList handlers = new HandlerList();
 	
 	public String permitAlias = null;
-	public EconomicData economicData = null;
+	public PriceRecord economicData = null;
 	public double newPrice;
 	public double oldPrice;
 	public boolean isCancelled = false;
@@ -23,11 +23,11 @@ public class PermitSignsPriceChangeEvent extends Event {
 		this.newPrice = newPrice;
 		this.oldPrice = oldPrice;
 		if ( economicData == null )
-			economicData = PermitSigns.instance.economy.getEconomicData( permitAlias );
+			economicData = PermitSigns.instance.prices.getPriceRecord( permitAlias );
 	}
 	
 	
-	public PermitSignsPriceChangeEvent( String permitAlias, double newPrice, double oldPrice, EconomicData economicData ) {
+	public PermitSignsPriceChangeEvent( String permitAlias, double newPrice, double oldPrice, PriceRecord economicData ) {
 		this.permitAlias = permitAlias;
 		this.newPrice = newPrice;
 		this.oldPrice = oldPrice;

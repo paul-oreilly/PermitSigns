@@ -10,9 +10,9 @@ import com.oreilly.common.interaction.text.interfaces.HasTitle;
 import com.oreilly.common.interaction.text.interfaces.HighlightClient;
 import com.oreilly.permitsigns.Config;
 import com.oreilly.permitsigns.PermitSigns;
+import com.oreilly.permitsigns.SignRecord;
 import com.oreilly.permitsigns.data.SignHeader;
 import com.oreilly.permitsigns.interactions.validators.ValidSignType;
-import com.oreilly.permitsigns.records.Sign;
 
 
 public class EditSignType extends InteractionPage implements HasTitle, HighlightClient {
@@ -27,7 +27,7 @@ public class EditSignType extends InteractionPage implements HasTitle, Highlight
 	
 	@Override
 	public String getDisplayText( Interaction interaction ) {
-		Sign sign = (Sign)interaction.context.get( "sign" );
+		SignRecord sign = (SignRecord)interaction.context.get( "sign" );
 		org.bukkit.block.Sign blockSign = (org.bukkit.block.Sign)interaction.context.get( "block" );
 		HashMap< String, SignHeader > signHeaders = PermitSigns.instance.signs.signHeaders;
 		String display = "The current header is " + blockSign.getLines()[0] +
@@ -44,7 +44,7 @@ public class EditSignType extends InteractionPage implements HasTitle, Highlight
 	
 	@Override
 	public String acceptValidatedInput( Interaction interaction, Object data ) {
-		Sign sign = (Sign)interaction.context.get( "sign" );
+		SignRecord sign = (SignRecord)interaction.context.get( "sign" );
 		String s = (String)data;
 		// check for an exact match..
 		SignHeader signHeader = PermitSigns.instance.signs.getHeader( s );

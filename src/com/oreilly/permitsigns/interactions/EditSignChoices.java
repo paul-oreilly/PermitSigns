@@ -3,7 +3,7 @@ package com.oreilly.permitsigns.interactions;
 import com.oreilly.common.interaction.text.Interaction;
 import com.oreilly.common.interaction.text.interfaces.HasTitle;
 import com.oreilly.common.interaction.text.pages.MenuPage;
-import com.oreilly.permitsigns.records.Sign;
+import com.oreilly.permitsigns.SignRecord;
 
 
 public class EditSignChoices extends MenuPage implements HasTitle {
@@ -21,7 +21,7 @@ public class EditSignChoices extends MenuPage implements HasTitle {
 	
 	@Override
 	public String getDisplayText( Interaction interaction ) {
-		Sign sign = (Sign)interaction.context.get( "sign" );
+		SignRecord sign = (SignRecord)interaction.context.get( "sign" );
 		if ( sign == null )
 			return "Display failed to initialise. No value for sign.";
 		return "This is a " + sign.signType.toHumanString() + ", linked to " + sign.permitAlias + "\n" +

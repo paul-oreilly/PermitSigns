@@ -3,7 +3,7 @@ package com.oreilly.permitsigns.interactions;
 import com.oreilly.common.interaction.text.Interaction;
 import com.oreilly.permitme.PermitMe;
 import com.oreilly.permitme.record.Permit;
-import com.oreilly.permitsigns.records.Sign;
+import com.oreilly.permitsigns.SignRecord;
 
 
 public class EditSignAlias extends SelectPermitAlias {
@@ -32,8 +32,8 @@ public class EditSignAlias extends SelectPermitAlias {
 			if ( permit != null ) {
 				Object signObj = interaction.context.get( "sign" );
 				if ( signObj != null )
-					if ( signObj instanceof Sign ) {
-						Sign sign = (Sign)signObj;
+					if ( signObj instanceof SignRecord ) {
+						SignRecord sign = (SignRecord)signObj;
 						sign.permitAlias = permitAlias;
 						return "Sign linkage updated to " + permitAlias;
 					}

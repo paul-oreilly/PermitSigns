@@ -12,18 +12,17 @@ import com.oreilly.permitme.record.Permit;
 import com.oreilly.permitme.record.PermitPlayer;
 import com.oreilly.permitsigns.data.EconomicRatio;
 import com.oreilly.permitsigns.events.PermitSignsPriceChangeEvent;
-import com.oreilly.permitsigns.records.EconomicData;
 
 
 // TODO: Some type of "default" economic data.
 
-public class Economy {
+public class Prices {
 	
 	private final TreeMap< String, Double > permitPrices = new TreeMap< String, Double >();
 	private final TreeMap< String, String > permitPricesAsStrings = new TreeMap< String, String >();
 	// sorted by permitUUID
-	private final TreeMap< String, EconomicData > economicData = new TreeMap< String, EconomicData >();
-	private final TreeMap< String, LinkedList< EconomicData >> dataByRatio = new TreeMap< String, LinkedList< EconomicData >>();
+	private final TreeMap< String, PriceRecord > economicData = new TreeMap< String, PriceRecord >();
+	private final TreeMap< String, LinkedList< PriceRecord >> dataByRatio = new TreeMap< String, LinkedList< PriceRecord >>();
 	// cached for when ratio data changes
 	private final TreeMap< String, LinkedList< String >> cacheRatioDataLinks = new TreeMap< String, LinkedList< String >>();
 	
@@ -31,7 +30,7 @@ public class Economy {
 	public int scheduleTaskID = 0;
 	
 	
-	public Economy( PermitSigns manager ) {
+	public Prices( PermitSigns manager ) {
 		// TODO: Setup timed event for updating some prices
 		// TODO: Default timed event interval
 		scheduleTaskID = manager.getServer().getScheduler().scheduleSyncRepeatingTask( manager, new Runnable() {
@@ -39,29 +38,31 @@ public class Economy {
 			@Override
 			public void run() {
 				if ( PermitSigns.instance != null )
-					PermitSigns.instance.economy.scheduledTaskUpdatePrices();
+					PermitSigns.instance.prices.scheduledTaskUpdatePrices();
 			}
 		}, 60L, scheduleTicksIntervalForTimeAdjustments );
 	}
 	
 	
-	public void addEconomicData( EconomicData data ) {
+	public void addEconomicData( PriceRecord data ) {
 		// TODO: Error checking
 		economicData.put( data.permitAlias, data );
 		if ( data.ratios != null )
 			addRatioRecords( data );
-		calculatePrice( data );
+		updatePrice( data );
 	}
 	
 	
 	public void scheduledTaskUpdatePrices() {
-		for ( EconomicData data : economicData.values() ) {
+		for ( PriceRecord data : economicData.values() ) {
+			boolean dataChange = false;
 			// update ratio decay data if required
 			if ( data.fixedRatioDecayDefined ) {
 				data.ticksSinceRatioDecayUpdated += scheduleTicksIntervalForTimeAdjustments;
 				if ( data.ticksSinceRatioDecayUpdated / 20 > data.fixedRatioDecayInterval ) {
 					data.ticksSinceRatioDecayUpdated -= 20 * data.fixedRatioDecayInterval;
 					data.variablePrice *= data.fixedRatioDecayFactor;
+					dataChange = true;
 				}
 			}
 			// update fixed decay data if required
@@ -70,6 +71,7 @@ public class Economy {
 				if ( data.ticksSinceTimeDecayUpdated / 20 > data.fixedTimeDecayInterval ) {
 					data.ticksSinceTimeDecayUpdated -= 20 * data.fixedTimeDecayInterval;
 					data.variablePrice -= data.fixedTimeDecayAmount;
+					dataChange = true;
 				}
 			}
 			// adjust to range if required
@@ -81,18 +83,16 @@ public class Economy {
 					data.variablePrice = data.minPrice;
 			} else if ( data.variablePrice < 0 )
 				data.variablePrice = 0;
+			// if we have a change, get the data updated
+			if ( dataChange )
+				updatePrice( data );
 		}
 	}
 	
 	
-	public void pricingChanged( EconomicData data ) {
-		calculatePrice( data );
-	}
-	
-	
-	public void ratioDataChanged( EconomicData data ) {
+	public void ratioDataChanged( PriceRecord data ) {
 		LinkedList< String > oldRecord = cacheRatioDataLinks.remove( data.permitAlias );
-		LinkedList< EconomicData > byRatio = null;
+		LinkedList< PriceRecord > byRatio = null;
 		if ( oldRecord != null ) {
 			// remove all existing entries
 			for ( String key : oldRecord ) {
@@ -118,7 +118,7 @@ public class Economy {
 	}
 	
 	
-	private void addRatioRecords( EconomicData data ) {
+	private void addRatioRecords( PriceRecord data ) {
 		// cache current data, so we can update if ratio data has later changed
 		LinkedList< String > cacheList = cacheRatioDataLinks.get( data.permitAlias );
 		if ( cacheList == null ) {
@@ -126,9 +126,9 @@ public class Economy {
 			cacheRatioDataLinks.put( data.permitAlias, cacheList );
 		}
 		// add to the "by ratio" record for the primary permit alias
-		LinkedList< EconomicData > byRatio = dataByRatio.get( data.permitAlias );
+		LinkedList< PriceRecord > byRatio = dataByRatio.get( data.permitAlias );
 		if ( byRatio == null ) {
-			byRatio = new LinkedList< EconomicData >();
+			byRatio = new LinkedList< PriceRecord >();
 			dataByRatio.put( data.permitAlias, byRatio );
 		}
 		byRatio.add( data );
@@ -139,7 +139,7 @@ public class Economy {
 			// add record to dataByRatio, so we can update when player numbers change later
 			byRatio = dataByRatio.get( ratio.otherAlias );
 			if ( byRatio == null ) {
-				byRatio = new LinkedList< EconomicData >();
+				byRatio = new LinkedList< PriceRecord >();
 				dataByRatio.put( ratio.otherAlias, byRatio );
 			}
 			byRatio.add( data );
@@ -148,13 +148,13 @@ public class Economy {
 	}
 	
 	
-	public TreeMap< String, EconomicData > getEconomicData() {
+	public TreeMap< String, PriceRecord > getEconomicData() {
 		return economicData;
 	}
 	
 	
-	public EconomicData getEconomicData( String permitAlias ) {
-		EconomicData result = economicData.get( permitAlias );
+	public PriceRecord getPriceRecord( String permitAlias ) {
+		PriceRecord result = economicData.get( permitAlias );
 		if ( result != null )
 			return result;
 		else {
@@ -164,7 +164,7 @@ public class Economy {
 				return null;
 			else {
 				// make a default economic data, and use that
-				result = new EconomicData( permitAlias, 10000 );
+				result = new PriceRecord( permitAlias, 10000 );
 				addEconomicData( result );
 				return result;
 			}
@@ -173,25 +173,27 @@ public class Economy {
 	
 	
 	public void playerGainedPermit( PermitPlayer player, String permitAlias ) {
-		EconomicData data = economicData.get( permitAlias );
+		PriceRecord data = economicData.get( permitAlias );
 		if ( data.purchaseFactorDefined )
 			data.variablePrice *= data.purchaseFactor;
 		updateRatios( data );
-		calculatePrice( permitAlias );
+		updatePrice( permitAlias );
 	}
 	
 	
 	public void playerLostPermit( PermitPlayer player, String permitAlias ) {
-		EconomicData data = economicData.get( permitAlias );
+		PriceRecord data = economicData.get( permitAlias );
 		updateRatios( data );
-		calculatePrice( permitAlias );
+		updatePrice( permitAlias );
 	}
 	
 	
 	public double getPrice( String permitAlias ) {
 		Double price = permitPrices.get( permitAlias );
-		if ( price == null )
-			return calculatePrice( permitAlias );
+		if ( price == null ) {
+			updatePrice( permitAlias );
+			return permitPrices.get( permitAlias );
+		}
 		else
 			return price;
 	}
@@ -232,18 +234,18 @@ public class Economy {
 	}
 	
 	
-	private double calculatePrice( String permitAlias ) {
-		EconomicData data = economicData.get( permitAlias );
+	protected boolean updatePrice( String permitAlias ) {
+		PriceRecord data = economicData.get( permitAlias );
 		if ( data == null ) {
-			data = new EconomicData( permitAlias, 10000 );
+			data = new PriceRecord( permitAlias, 10000 );
 			economicData.put( permitAlias, data );
 			Config.saveEconomicData( data );
 		}
-		return calculatePrice( data );
+		return updatePrice( data );
 	}
 	
 	
-	private double calculatePrice( EconomicData data ) {
+	protected boolean updatePrice( PriceRecord data ) {
 		double result;
 		boolean dynamicPriceDefined = ( data.purchaseFactorDefined | data.fixedRatioDecayDefined | data.fixedTimeDecayDefined );
 		// if only a base price is defined, then the price is the base price...
@@ -266,15 +268,19 @@ public class Economy {
 			PermitSignsPriceChangeEvent permitSignsEvent = new PermitSignsPriceChangeEvent( data.permitAlias, result,
 					data.currentPrice );
 			PermitSigns.instance.getServer().getPluginManager().callEvent( permitSignsEvent );
+			return ( !permitSignsEvent.isCancelled );
 		}
-		return result;
+		return true;
 	}
 	
 	
-	public void priceChangeEventSuccess( EconomicData data, double newPrice ) {
+	public void priceChangeEventSuccess( PriceRecord data, double newPrice ) {
 		data.currentPrice = newPrice;
 		permitPrices.put( data.permitAlias, newPrice );
+		// save the record
 		Config.saveEconomicData( data );
+		// invalidate cache's
+		permitPricesAsStrings.remove( data.permitAlias );
 	}
 	
 	
@@ -283,15 +289,15 @@ public class Economy {
 	}
 	
 	
-	private void updateRatios( EconomicData data ) {
-		LinkedList< EconomicData > list = dataByRatio.get( data.permitAlias );
+	private void updateRatios( PriceRecord data ) {
+		LinkedList< PriceRecord > list = dataByRatio.get( data.permitAlias );
 		if ( list != null )
-			for ( EconomicData ed : list )
+			for ( PriceRecord ed : list )
 				updateRatioPrice( ed );
 	}
 	
 	
-	private void updateRatioPrice( EconomicData data ) {
+	private void updateRatioPrice( PriceRecord data ) {
 		Players players = PermitMe.instance.players;
 		double aim;
 		double current;

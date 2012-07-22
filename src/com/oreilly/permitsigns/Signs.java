@@ -21,11 +21,10 @@ import com.oreilly.permitme.record.PermitPlayer;
 import com.oreilly.permitsigns.data.SignHeader;
 import com.oreilly.permitsigns.data.SignType;
 import com.oreilly.permitsigns.interactions.EditSignChoices;
-import com.oreilly.permitsigns.records.Sign;
 
 
 @SuppressWarnings("serial")
-class SignList extends LinkedList< Sign > {
+class SignList extends LinkedList< SignRecord > {
 }
 
 
@@ -60,8 +59,8 @@ public class Signs {
 	
 	WorldChunk< SignList > signsByChunk = new WorldChunk< SignList >();
 	HashMap< String, SignList > signsByPermitAlias = new HashMap< String, SignList >();
-	WorldLocation< Sign > signsByLocation = new WorldLocation< Sign >();
-	HashMap< String, LinkedList< Sign >> signsByWorld = new HashMap< String, LinkedList< Sign >>();
+	WorldLocation< SignRecord > signsByLocation = new WorldLocation< SignRecord >();
+	HashMap< String, LinkedList< SignRecord >> signsByWorld = new HashMap< String, LinkedList< SignRecord >>();
 	
 	public HashMap< String, SignHeader > signHeaders = new HashMap< String, SignHeader >();
 	
@@ -126,25 +125,25 @@ public class Signs {
 	}
 	
 	
-	public void registerSign( Sign sign ) {
+	public void registerSign( SignRecord sign ) {
 		// add to signsByLocation
 		String worldName = sign.location.getWorld().getName();
-		ThreeIntHash< Sign > threedee = signsByLocation.get( worldName );
+		ThreeIntHash< SignRecord > threedee = signsByLocation.get( worldName );
 		if ( threedee == null ) {
-			threedee = new ThreeIntHash< Sign >();
+			threedee = new ThreeIntHash< SignRecord >();
 			signsByLocation.put( worldName, threedee );
 		}
-		TwoIntHash< Sign > twodee = threedee.get( sign.location.getBlockX() );
+		TwoIntHash< SignRecord > twodee = threedee.get( sign.location.getBlockX() );
 		if ( twodee == null ) {
-			twodee = new TwoIntHash< Sign >();
+			twodee = new TwoIntHash< SignRecord >();
 			threedee.put( sign.location.getBlockX(), twodee );
 		}
-		IntHash< Sign > onedee = twodee.get( sign.location.getBlockY() );
+		IntHash< SignRecord > onedee = twodee.get( sign.location.getBlockY() );
 		if ( onedee == null ) {
-			onedee = new IntHash< Sign >();
+			onedee = new IntHash< SignRecord >();
 			twodee.put( sign.location.getBlockY(), onedee );
 		}
-		Sign existingSign = onedee.get( sign.location.getBlockZ() );
+		SignRecord existingSign = onedee.get( sign.location.getBlockZ() );
 		if ( existingSign == null )
 			onedee.put( sign.location.getBlockZ(), sign );
 		else {
@@ -180,16 +179,16 @@ public class Signs {
 		}
 		signs.add( sign );
 		// add to signs by world
-		LinkedList< Sign > worldList = signsByWorld.get( worldName );
+		LinkedList< SignRecord > worldList = signsByWorld.get( worldName );
 		if ( worldList == null ) {
-			worldList = new LinkedList< Sign >();
+			worldList = new LinkedList< SignRecord >();
 			signsByWorld.put( worldName, worldList );
 		}
 		worldList.add( sign );
 	}
 	
 	
-	public List< Sign > getSignsInWorld( String worldName ) {
+	public List< SignRecord > getSignsInWorld( String worldName ) {
 		return signsByWorld.get( worldName );
 	}
 	
@@ -202,7 +201,7 @@ public class Signs {
 	
 	// TODO: Check boolean return is used for cancelling the event
 	public boolean rightClicked( Player player, BlockState block ) {
-		Sign permitSign = getSignAtLocation( block.getLocation() );
+		SignRecord permitSign = getSignAtLocation( block.getLocation() );
 		
 		// editing players, if sneaking (having right clicked a sign), start the 
 		// sign editing text interface.
@@ -210,7 +209,7 @@ public class Signs {
 		if ( signEditingPlayers.contains( player.getName() ) ) {
 			if ( player.isSneaking() ) {
 				if ( permitSign == null ) {
-					permitSign = new Sign( block.getLocation() );
+					permitSign = new SignRecord( block.getLocation() );
 					registerSign( permitSign );
 				}
 				Interaction interaction = editSignInteraction.buildInteraction( player );
@@ -239,7 +238,7 @@ public class Signs {
 	
 	
 	public void playerPurchase( Player player, Block block ) {
-		if ( !( block instanceof Sign ) )
+		if ( !( block instanceof SignRecord ) )
 			return;
 		org.bukkit.block.Sign sign = (org.bukkit.block.Sign)block;
 		String[] lines = sign.getLines();
@@ -251,20 +250,20 @@ public class Signs {
 					return;
 				else {
 					Location location = sign.getLocation();
-					Sign permitSign = getSignAtLocation( location );
+					SignRecord permitSign = getSignAtLocation( location );
 					if ( permitSign != null ) {
 						PermitPlayer permitPlayer = PermitMe.instance.players.getPlayer( player.getName() );
 						if ( permitPlayer.permits.contains( permitSign.permitAlias ) )
 							return;
 						else {
-							double balance = PermitSigns.instance.economy.checkPlayerBalance( player.getName() );
-							double price = PermitSigns.instance.economy.getPrice( permitSign.permitAlias );
+							double balance = PermitSigns.instance.prices.checkPlayerBalance( player.getName() );
+							double price = PermitSigns.instance.prices.getPrice( permitSign.permitAlias );
 							if ( balance < price ) {
 								player.sendMessage( "You don't have enough money to purchase this" );
 								return;
 							} else {
 								if ( PermitMe.instance.addPermitToPlayer( player.getName(), permitSign.permitAlias ) ) {
-									if ( !PermitSigns.instance.economy.takeMoneyFromPlayer( player.getName(), price ) )
+									if ( !PermitSigns.instance.prices.takeMoneyFromPlayer( player.getName(), price ) )
 										PermitMe.instance.removePermitFromPlayer( player.getName(),
 												permitSign.permitAlias );
 								}
@@ -284,7 +283,7 @@ public class Signs {
 		SignList list = signsByPermitAlias.get( permitAlias );
 		if ( list == null )
 			return;
-		for ( Sign sign : list )
+		for ( SignRecord sign : list )
 			if ( sign.signType == SignType.MONITOR )
 				refresh( sign );
 	}
@@ -296,7 +295,7 @@ public class Signs {
 			if ( list == null )
 				continue;
 			else
-				for ( Sign sign : list )
+				for ( SignRecord sign : list )
 					if ( sign.signType == SignType.MONITOR )
 						refresh( sign );
 		}
@@ -305,14 +304,14 @@ public class Signs {
 	
 	public void refreshAllSigns() {
 		PermitMe.log.info( "[PermitSigns] DEBUG: Refreshing all sign data" );
-		for ( LinkedList< Sign > list : signsByWorld.values() )
-			for ( Sign sign : list )
+		for ( LinkedList< SignRecord > list : signsByWorld.values() )
+			for ( SignRecord sign : list )
 				refresh( sign );
 	}
 	
 	
 	public void refresh( Location location ) {
-		Sign sign = getSignAtLocation( location );
+		SignRecord sign = getSignAtLocation( location );
 		if ( sign == null )
 			return;
 		refresh( sign );
@@ -320,7 +319,7 @@ public class Signs {
 	
 	
 	public void refresh( Block block ) {
-		Sign sign = getSignAtLocation( block.getLocation() );
+		SignRecord sign = getSignAtLocation( block.getLocation() );
 		if ( sign == null )
 			return;
 		refresh( sign );
@@ -339,20 +338,22 @@ public class Signs {
 		SignList signs = onedee.get( chunk.getZ() );
 		if ( signs == null )
 			return;
-		for ( Sign sign : signs )
+		for ( SignRecord sign : signs )
 			refresh( sign );
 	}
 	
 	
 	public void refresh( String permitAlias ) {
 		SignList list = signsByPermitAlias.get( permitAlias );
+		// DEBUG:
+		PermitMe.log.info( "[PermitSigns] DEBUG: Sign refesh by alias called for " + permitAlias );
 		if ( list != null )
-			for ( Sign sign : list )
+			for ( SignRecord sign : list )
 				refresh( sign );
 	}
 	
 	
-	public void refresh( Sign sign ) {
+	public void refresh( SignRecord sign ) {
 		if ( sign == null ) {
 			PermitMe.log.warning( "[PermitSigns] Cannot refresh sign, as sign value is NULL" );
 			return;
@@ -362,6 +363,8 @@ public class Signs {
 					sign.toHumanString() );
 			return;
 		}
+		// DEBUG:
+		PermitMe.log.info( "[PermitSigns] DEBUG: Refeshing sign:\n" + sign.toHumanString() );
 		Block block = sign.location.getBlock();
 		BlockState blockState = block.getState();
 		if ( blockState instanceof org.bukkit.block.Sign ) {
@@ -372,10 +375,10 @@ public class Signs {
 			signBlock.setLine( 2, permitDisplay[1] );
 			switch ( sign.signType ) {
 				case SALEPREVIEW:
-					signBlock.setLine( 3, PermitSigns.instance.economy.getPriceString( sign.permitAlias ) );
+					signBlock.setLine( 3, PermitSigns.instance.prices.getPriceString( sign.permitAlias ) );
 					break;
 				case SALE:
-					signBlock.setLine( 3, PermitSigns.instance.economy.getPriceString( sign.permitAlias ) );
+					signBlock.setLine( 3, PermitSigns.instance.prices.getPriceString( sign.permitAlias ) );
 					break;
 				case MONITOR:
 					int online = PermitSigns.instance.tracker.getOnlinePlayerCountByPermit( sign.permitAlias );
@@ -392,15 +395,15 @@ public class Signs {
 	}
 	
 	
-	private Sign getSignAtLocation( Location location ) {
+	private SignRecord getSignAtLocation( Location location ) {
 		String worldName = location.getWorld().getName();
-		ThreeIntHash< Sign > threedee = signsByLocation.get( worldName );
+		ThreeIntHash< SignRecord > threedee = signsByLocation.get( worldName );
 		if ( threedee == null )
 			return null;
-		TwoIntHash< Sign > twodee = threedee.get( location.getBlockX() );
+		TwoIntHash< SignRecord > twodee = threedee.get( location.getBlockX() );
 		if ( twodee == null )
 			return null;
-		IntHash< Sign > onedee = twodee.get( location.getBlockY() );
+		IntHash< SignRecord > onedee = twodee.get( location.getBlockY() );
 		if ( onedee == null )
 			return null;
 		return onedee.get( location.getBlockZ() );

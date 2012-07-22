@@ -29,12 +29,12 @@ public class PermitSigns extends JavaPlugin {
 	public static PermitSigns instance = null;
 	
 	public Signs signs = null;
-	public com.oreilly.permitsigns.Economy economy = null;
+	public Prices prices = null;
 	public PlayerTracker tracker = null;
 	
 	protected InteractionFactory adminInteraction = null;
 	
-	public net.milkbowl.vault.economy.Economy vaultEconomy = null;
+	public Economy vaultEconomy = null;
 	
 	
 	public PermitSigns() {
@@ -51,7 +51,7 @@ public class PermitSigns extends JavaPlugin {
 		PermitMe.log.info( "[PermitSigns] Enabling..." );
 		
 		signs = new Signs();
-		economy = new com.oreilly.permitsigns.Economy( this );
+		prices = new com.oreilly.permitsigns.Prices( this );
 		tracker = new PlayerTracker();
 		
 		Config.load();

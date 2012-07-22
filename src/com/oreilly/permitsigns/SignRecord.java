@@ -1,4 +1,4 @@
-package com.oreilly.permitsigns.records;
+package com.oreilly.permitsigns;
 
 import java.util.HashSet;
 
@@ -9,13 +9,12 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import com.oreilly.permitme.PermitMe;
 import com.oreilly.permitme.record.Permit;
-import com.oreilly.permitsigns.PermitSigns;
 import com.oreilly.permitsigns.data.SignHeader;
 import com.oreilly.permitsigns.data.SignType;
 import com.oreilly.permitsigns.util.Locations;
 
 
-public class Sign {
+public class SignRecord {
 	
 	static private int nextFileUID = 1;
 	static private HashSet< String > takenUIDs = new HashSet< String >();
@@ -27,7 +26,7 @@ public class Sign {
 	public SignHeader signHeader = null;
 	
 	
-	static public Sign fromConfigurationSection( ConfigurationSection section, String UID, String errorLocation ) {
+	static public SignRecord fromConfigurationSection( ConfigurationSection section, String UID, String errorLocation ) {
 		if ( section == null )
 			return null;
 		String headerString = section.getString( SignConfigConstants.signHeader );
@@ -41,7 +40,7 @@ public class Sign {
 			return null;
 		// TODO: Seperate role based sign class (to store extra data, like
 		// ratio's, initial number etc)
-		return new Sign( header, aliasString, location, UID );
+		return new SignRecord( header, aliasString, location, UID );
 	}
 	
 	
@@ -56,17 +55,17 @@ public class Sign {
 	}
 	
 	
-	public Sign( Location location ) {
+	public SignRecord( Location location ) {
 		this( new SignHeader( "[!!!]", SignType.UNDEFINED ), "???", location, nextUID() );
 	}
 	
 	
-	public Sign( SignHeader signHeader, String permitAlias, Location location ) {
+	public SignRecord( SignHeader signHeader, String permitAlias, Location location ) {
 		this( signHeader, permitAlias, location, nextUID() );
 	}
 	
 	
-	public Sign( SignHeader signHeader, String permitAlias, Location location, String UID ) {
+	public SignRecord( SignHeader signHeader, String permitAlias, Location location, String UID ) {
 		this.signHeader = signHeader;
 		this.signType = signHeader.type;
 		this.permitAlias = permitAlias;

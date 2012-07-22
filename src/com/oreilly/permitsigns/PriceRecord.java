@@ -1,4 +1,4 @@
-package com.oreilly.permitsigns.records;
+package com.oreilly.permitsigns;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -10,48 +10,48 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import com.oreilly.permitsigns.data.EconomicRatio;
 
 
-public class EconomicData {
+public class PriceRecord {
 	
-	public double basePrice = 0;
-	public boolean maxPriceDefined = false;
-	public double maxPrice = 0;
-	public boolean minPriceDefined = false;
-	public double minPrice = 0;
-	public double roundingFactor = 1;
+	protected double basePrice = 0;
+	protected boolean maxPriceDefined = false;
+	protected double maxPrice = 0;
+	protected boolean minPriceDefined = false;
+	protected double minPrice = 0;
+	protected double roundingFactor = 1;
 	
 	// purchase and decay system
-	public double variablePrice = 0;
-	public boolean fixedTimeDecayDefined = false;
-	public double fixedTimeDecayAmount = 0;
-	public int fixedTimeDecayInterval = 0; // in seconds
-	public boolean purchaseFactorDefined = false;
-	public double purchaseFactor = 1;
+	protected double variablePrice = 0;
+	protected boolean fixedTimeDecayDefined = false;
+	protected double fixedTimeDecayAmount = 0;
+	protected int fixedTimeDecayInterval = 0; // in seconds
+	protected boolean purchaseFactorDefined = false;
+	protected double purchaseFactor = 1;
 	// TODO: Add "PurchaseDelta" for fixed amount
-	public boolean fixedRatioDecayDefined = false;
-	public double fixedRatioDecayFactor = 1;
-	public int fixedRatioDecayInterval = 0; // in seconds
+	protected boolean fixedRatioDecayDefined = false;
+	protected double fixedRatioDecayFactor = 1;
+	protected int fixedRatioDecayInterval = 0; // in seconds
 	
 	// ratio based data - by alias
-	public boolean ratioDefined = false;
-	public HashMap< String, EconomicRatio > ratios = new HashMap< String, EconomicRatio >();
+	protected boolean ratioDefined = false;
+	protected HashMap< String, EconomicRatio > ratios = new HashMap< String, EconomicRatio >();
 	
 	public String permitAlias = null;
 	
 	// the current price, after all calculations are done
-	public double currentPrice = 0;
-	public double ratioPrice = 0; // cache
+	protected double currentPrice = 0;
+	protected double ratioPrice = 0; // cache
 	
 	// other data not saved
-	public int ticksSinceTimeDecayUpdated = 0;
-	public int ticksSinceRatioDecayUpdated = 0;
+	protected int ticksSinceTimeDecayUpdated = 0;
+	protected int ticksSinceRatioDecayUpdated = 0;
 	
 	
-	static public EconomicData fromConfigurationSection( ConfigurationSection section, String errorLocation ) {
+	static public PriceRecord fromConfigurationSection( ConfigurationSection section, String errorLocation ) {
 		String permitAlias = section.getString( EconomicDataConfigConstant.permitAlias );
 		if ( permitAlias == null )
 			return null;
 		double basePrice = section.getDouble( EconomicDataConfigConstant.basePrice, 10000L );
-		EconomicData result = new EconomicData( permitAlias, basePrice );
+		PriceRecord result = new PriceRecord( permitAlias, basePrice );
 		result.maxPriceDefined = section.contains( EconomicDataConfigConstant.maxPrice );
 		if ( result.maxPriceDefined )
 			result.maxPrice = section.getDouble( EconomicDataConfigConstant.maxPrice );
@@ -84,9 +84,21 @@ public class EconomicData {
 	}
 	
 	
-	public EconomicData( String permitAlias, double basePrice ) {
+	public PriceRecord( String permitAlias, double basePrice ) {
 		this.permitAlias = permitAlias;
 		this.basePrice = basePrice;
+	}
+	
+	
+	public double getBasePrice() {
+		return basePrice;
+	}
+	
+	
+	public boolean setBasePrice( double newPrice ) {
+		// TODO: Add event, and return false if cancalled
+		basePrice = newPrice;
+		return PermitSigns.instance.prices.updatePrice( this );
 	}
 	
 	
