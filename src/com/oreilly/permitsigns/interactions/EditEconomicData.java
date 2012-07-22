@@ -3,8 +3,8 @@ package com.oreilly.permitsigns.interactions;
 import com.oreilly.common.interaction.text.Interaction;
 import com.oreilly.common.interaction.text.interfaces.HasTitle;
 import com.oreilly.common.interaction.text.pages.MenuPage;
-import com.oreilly.permitsigns.PriceRecord;
 import com.oreilly.permitsigns.PermitSigns;
+import com.oreilly.permitsigns.PriceRecord;
 import com.oreilly.permitsigns.interactions.pricing.EditBasePrice;
 import com.oreilly.permitsigns.interactions.pricing.EditMaxPrice;
 import com.oreilly.permitsigns.interactions.pricing.EditMinPrice;
@@ -17,6 +17,7 @@ public class EditEconomicData extends MenuPage implements HasTitle {
 	
 	public EditEconomicData() {
 		super();
+		withChoice( "view", new ViewEconomicData() );
 		withChoice( "base", new EditBasePrice() );
 		withAlias( "base", "1" );
 		withChoice( "minimum", new EditMinPrice() );
@@ -29,13 +30,11 @@ public class EditEconomicData extends MenuPage implements HasTitle {
 		withAlias( "rounding", "4" );
 		withAlias( "rounding", "round" );
 		withChoice( "variable", new EditVariablePricing() );
-		withAlias( "variable", "var" );
-		withAlias( "variable", "v" );
 		withAlias( "variable", "5" );
 		withChoice( "ratio", new EditRatioPricing() );
-		withAlias( "ratio", "r" );
 		withAlias( "ratio", "6" );
 		validationFailedMessage = "Please type one of the highlighted options to proceed";
+		loopbackOnCompletion = true;
 	}
 	
 	
@@ -54,7 +53,8 @@ public class EditEconomicData extends MenuPage implements HasTitle {
 			PriceRecord economicData = PermitSigns.instance.prices.getPriceRecord( permitAlias );
 			if ( economicData != null ) {
 				return "Currently editing prices for " + permitAlias + ":\n\n" +
-						"Please select an option to edit (or exit to quit)\n" +
+						"Please select an option (or exit to quit)\n" +
+						"(type \'view\' to see the current settings)\n" +
 						"1. Base price\n" +
 						"2. Minimum price\n" +
 						"3. Maximum price\n" +

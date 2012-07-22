@@ -95,12 +95,182 @@ public class PriceRecord {
 	}
 	
 	
-	public boolean setBasePrice( double newPrice ) {
-		// TODO: Add event, and return false if cancalled
+	public void setBasePrice( double newPrice ) {
 		basePrice = newPrice;
-		return PermitSigns.instance.prices.updatePrice( this );
+		PermitSigns.instance.prices.priceRecordChange( this );
 	}
 	
+	
+	public double getMaxPrice() {
+		return maxPrice;
+	}
+	
+	
+	public void setMaxPrice( double newPrice ) {
+		maxPrice = newPrice;
+		maxPriceDefined = true;
+		PermitSigns.instance.prices.priceRecordChange( this );
+	}
+	
+	
+	public double getMinPrice() {
+		return minPrice;
+	}
+	
+	
+	public void setMinPrice( double newPrice ) {
+		minPrice = newPrice;
+		minPriceDefined = true;
+		PermitSigns.instance.prices.priceRecordChange( this );
+	}
+	
+	
+	public double getRounding() {
+		return roundingFactor;
+	}
+	
+	
+	public void setRounding( double newFactor ) {
+		roundingFactor = newFactor;
+		PermitSigns.instance.prices.priceRecordChange( this );
+	}
+	
+	
+	public double getVariablePrice() {
+		return variablePrice;
+	}
+	
+	
+	public void setVariablePrice( double newPrice ) {
+		variablePrice = newPrice;
+		PermitSigns.instance.prices.priceRecordChange( this );
+	}
+	
+	
+	public boolean getVariablePriceDefined() {
+		return ( fixedTimeDecayDefined | purchaseFactorDefined | fixedRatioDecayDefined );
+	}
+	
+	
+	public boolean getTimeAmountDefined() {
+		return fixedTimeDecayDefined;
+	}
+	
+	
+	public void setTimeAmountDefined( boolean newValue ) {
+		fixedTimeDecayDefined = newValue;
+		PermitSigns.instance.prices.priceRecordChange( this );
+	}
+	
+	
+	public double getTimeAmount() {
+		return fixedTimeDecayAmount;
+	}
+	
+	
+	public void setTimeAmount( double newValue ) {
+		fixedTimeDecayAmount = newValue;
+		fixedTimeDecayDefined = true;
+		PermitSigns.instance.prices.priceRecordChange( this );
+	}
+	
+	
+	public int getTimeAmountInterval() {
+		return fixedTimeDecayInterval;
+	}
+	
+	
+	public void setTimeAmountInterval( int ticks ) {
+		fixedTimeDecayInterval = ticks;
+		PermitSigns.instance.prices.priceRecordChange( this );
+	}
+	
+	
+	// TODO: Add fixed amonut, and then meta boolean for either
+	
+	public boolean getPurchaseFactorDefined() {
+		return purchaseFactorDefined;
+	}
+	
+	
+	public void setPruchaseFactorDefined( boolean newValue ) {
+		purchaseFactorDefined = newValue;
+		PermitSigns.instance.prices.priceRecordChange( this );
+	}
+	
+	
+	public double getPurchaseFactor() {
+		return purchaseFactor;
+	}
+	
+	
+	public void setPurchaseFactor( double newFactor ) {
+		purchaseFactor = newFactor;
+		purchaseFactorDefined = true;
+		PermitSigns.instance.prices.priceRecordChange( this );
+	}
+	
+	
+	public boolean getTimeFactorDefined() {
+		return fixedRatioDecayDefined;
+	}
+	
+	
+	public void setTimeFactorDefined( boolean newValue ) {
+		fixedRatioDecayDefined = newValue;
+		PermitSigns.instance.prices.priceRecordChange( this );
+	}
+	
+	
+	public double getTimeFactor() {
+		return fixedRatioDecayFactor;
+	}
+	
+	
+	public void setTimeFactor( double newFactor ) {
+		fixedRatioDecayFactor = newFactor;
+		fixedRatioDecayDefined = true;
+		PermitSigns.instance.prices.priceRecordChange( this );
+	}
+	
+	
+	public int getTimeFactorInterval() {
+		return fixedRatioDecayInterval;
+	}
+	
+	
+	public void setTimeFactorInterval( int ticks ) {
+		fixedRatioDecayInterval = ticks;
+		PermitSigns.instance.prices.priceRecordChange( this );
+	}
+	
+	
+	public boolean getRatioPriceDefined() {
+		return ratioDefined;
+	}
+	
+	
+	public void setRatioPriceDefined( boolean newValue ) {
+		ratioDefined = newValue;
+		PermitSigns.instance.prices.priceRecordChange( this );
+	}
+	
+	
+	public double getRatioPrice() {
+		return ratioPrice;
+	}
+	
+	
+	public List< EconomicRatio > getPriceRatios() {
+		LinkedList< EconomicRatio > result = new LinkedList< EconomicRatio >();
+		result.addAll( ratios.values() );
+		return result;
+	}
+	
+	
+	// TODO: add and remove price ratio functions
+	
+	// IO Functions...
 	
 	public void saveToConfig( YamlConfiguration config, String path ) {
 		config.set( path + "." + EconomicDataConfigConstant.permitAlias, permitAlias );
@@ -152,11 +322,11 @@ public class PriceRecord {
 		if ( minPriceDefined | maxPriceDefined ) {
 			result += bodyPrefix + " (with a ";
 			if ( minPriceDefined )
-				result += "minimum price of " + withRounding( minPrice );
+				result += "minimum of " + withRounding( minPrice );
 			if ( minPriceDefined & maxPriceDefined )
 				result += " and a ";
 			if ( maxPriceDefined )
-				result += " maximum price of " + withRounding( maxPrice );
+				result += "maximum of " + withRounding( maxPrice );
 			result += ")\n";
 		} else
 			result += bodyPrefix + "(No Minimum and / or maxium prices)\n";

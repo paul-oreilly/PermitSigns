@@ -18,7 +18,6 @@ public class EditBasePrice extends InteractionPage implements HasTitle {
 		PriceRecord data = PermitSigns.instance.prices.getPriceRecord( permitAlias );
 		if ( data == null )
 			return "Unable to resolve data for " + permitAlias;
-		// TODO: Some formatting function for display
 		return "The current base price for " + permitAlias + " is " + data.getBasePrice() + ".\n" +
 				"Please enter a new value, or \'exit\' to quit";
 	}
@@ -47,15 +46,8 @@ public class EditBasePrice extends InteractionPage implements HasTitle {
 		if ( priceData == null )
 			return "Unable to resolve data for " + permitAlias;
 		// change the value
-		// TODO: This needs to be done in some method that updates system data - maybe an event?
-		// DEFINATLY not by altering directly!
-		// SUGGEST: Records hide their information (oh nos!) and send events on data change.
-		//  can send "RawPriceChange", which economics can pick up, get new price, and send "PriceChange" 
-		//  with all the numbers updated.
-		if ( priceData.setBasePrice( newPrice ) )
-			return "Base price for " + permitAlias + " is now " + newPrice;
-		else
-			return "Base price has been updated, however an update of the current price was cancelled.";
+		priceData.setBasePrice( newPrice );
+		return "Base price for " + permitAlias + " is now " + newPrice;
 	}
 	
 	

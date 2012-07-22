@@ -234,18 +234,35 @@ public class Prices {
 	}
 	
 	
+	protected void priceRecordChange( PriceRecord record ) {
+		// TODO.. add to timing functions, etc etc.
+		updatePrice( record );
+		Config.savePriceData( record );
+	}
+	
+	
 	protected boolean updatePrice( String permitAlias ) {
+		return updatePrice( permitAlias, false );
+	}
+	
+	
+	protected boolean updatePrice( String permitAlias, boolean forceSave ) {
 		PriceRecord data = economicData.get( permitAlias );
 		if ( data == null ) {
 			data = new PriceRecord( permitAlias, 10000 );
 			economicData.put( permitAlias, data );
 			Config.savePriceData( data );
 		}
-		return updatePrice( data );
+		return updatePrice( data, forceSave );
 	}
 	
 	
 	protected boolean updatePrice( PriceRecord data ) {
+		return updatePrice( data, false );
+	}
+	
+	
+	protected boolean updatePrice( PriceRecord data, boolean forceSave ) {
 		double result;
 		boolean dynamicPriceDefined = ( data.purchaseFactorDefined | data.fixedRatioDecayDefined | data.fixedTimeDecayDefined );
 		// if only a base price is defined, then the price is the base price...

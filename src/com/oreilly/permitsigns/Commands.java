@@ -92,10 +92,12 @@ class PermitSignsAdmin extends Commands {
 	
 	@Override
 	public boolean run( CommandSender sender, Command cmd, String commandLabel, String[] data ) {
-		if ( !standardPermissionCheck( sender, "permitSigns.signs.admin" ) )
-			return false;
+		// TODO: Permission check
+		//if ( !standardPermissionCheck( sender, "permitSigns.signs.admin" ) )
+		//	return false;
 		Interaction interaction = PermitSigns.instance.adminInteraction.buildInteraction( sender );
-		interaction.begin();
+		if ( interaction != null )
+			interaction.begin();
 		return true;
 	}
 }
