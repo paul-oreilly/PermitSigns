@@ -1,14 +1,19 @@
 package com.oreilly.permitsigns.interactions.pricing;
 
 import com.oreilly.common.interaction.text.Interaction;
-import com.oreilly.common.interaction.text.InteractionPage;
-import com.oreilly.common.interaction.text.interfaces.HasTitle;
+import com.oreilly.common.interaction.text.TitledInteractionPage;
 import com.oreilly.permitsigns.PermitSigns;
 import com.oreilly.permitsigns.PriceRecord;
 import com.oreilly.permitsigns.interactions.SelectPermitAlias;
 
 
-public class EditRounding extends InteractionPage implements HasTitle {
+public class EditRounding extends TitledInteractionPage {
+	
+	public EditRounding() {
+		super();
+		defaultTitle = "Edit Rounding Factor";
+	}
+	
 	
 	@Override
 	public String getDisplayText( Interaction interaction ) {
@@ -48,12 +53,6 @@ public class EditRounding extends InteractionPage implements HasTitle {
 		// change the value
 		priceData.setRounding( newRounding );
 		return "Prices for " + permitAlias + " will now be rounded to the nearest " + newRounding;
-	}
-	
-	
-	@Override
-	public String getTitle() {
-		return "Edit Rounding Factor";
 	}
 	
 }

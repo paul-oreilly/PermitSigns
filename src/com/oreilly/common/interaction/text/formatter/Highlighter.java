@@ -5,6 +5,7 @@ import java.util.Iterator;
 
 import org.bukkit.ChatColor;
 
+import com.oreilly.common.interaction.text.Interaction;
 import com.oreilly.common.interaction.text.InteractionPage;
 import com.oreilly.common.interaction.text.interfaces.HighlightClient;
 import com.oreilly.permitme.PermitMe;
@@ -32,7 +33,7 @@ public class Highlighter extends Formatter {
 	
 	
 	@Override
-	protected String format( String s, InteractionPage page ) {
+	protected String format( String s, InteractionPage page, Interaction interaction ) {
 		if ( !( page instanceof HighlightClient ) ) {
 			PermitMe.log.info( "com.oreilly.common: Failed to format text with highlighter, as page " +
 					page.getClass().toString() + " does not implement highlight client" );

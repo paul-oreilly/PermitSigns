@@ -5,8 +5,9 @@ import java.util.HashMap;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 
+import com.oreilly.common.interaction.text.Interaction;
 import com.oreilly.common.interaction.text.InteractionPage;
-import com.oreilly.common.interaction.text.interfaces.HasTitle;
+import com.oreilly.common.interaction.text.TitledInteractionPage;
 
 
 // TODO: Interface with style's based on context data
@@ -71,15 +72,15 @@ public class Border extends Formatter {
 	
 	
 	@Override
-	protected String format( String s, InteractionPage page ) {
+	protected String format( String s, InteractionPage page, Interaction interaction ) {
 		String result = "";
 		HashMap< String, String > characterStyles = getCharacterStyles( page );
 		HashMap< String, String > colorStyles = getChatColorStyles( page );
 		// title, if one exists
-		if ( page instanceof HasTitle ) {
+		if ( page instanceof TitledInteractionPage ) {
 			result += makeLine( LineType.TITLE_TOP, characterStyles, colorStyles );
-			HasTitle withTitle = (HasTitle)page;
-			result += colorStyles.get( COLOR_TITLE_TEXT ) + "  " + withTitle.getTitle() + "\n";
+			TitledInteractionPage withTitle = (TitledInteractionPage)page;
+			result += colorStyles.get( COLOR_TITLE_TEXT ) + "  " + withTitle.getTitle( interaction ) + "\n";
 			result += makeLine( LineType.TITLE_BOTTOM, characterStyles, colorStyles );
 		}
 		// page body

@@ -1,14 +1,19 @@
 package com.oreilly.permitsigns.interactions.pricing;
 
 import com.oreilly.common.interaction.text.Interaction;
-import com.oreilly.common.interaction.text.InteractionPage;
-import com.oreilly.common.interaction.text.interfaces.HasTitle;
+import com.oreilly.common.interaction.text.TitledInteractionPage;
 import com.oreilly.permitsigns.PermitSigns;
 import com.oreilly.permitsigns.PriceRecord;
 import com.oreilly.permitsigns.interactions.SelectPermitAlias;
 
 
-public class EditBasePrice extends InteractionPage implements HasTitle {
+public class EditBasePrice extends TitledInteractionPage {
+	
+	public EditBasePrice() {
+		super();
+		defaultTitle = "Edit Base Price";
+	}
+	
 	
 	@Override
 	public String getDisplayText( Interaction interaction ) {
@@ -48,11 +53,5 @@ public class EditBasePrice extends InteractionPage implements HasTitle {
 		// change the value
 		priceData.setBasePrice( newPrice );
 		return "Base price for " + permitAlias + " is now " + newPrice;
-	}
-	
-	
-	@Override
-	public String getTitle() {
-		return "Edit Base Price";
 	}
 }

@@ -2,15 +2,15 @@ package com.oreilly.permitsigns.interactions;
 
 import com.oreilly.common.interaction.text.Interaction;
 import com.oreilly.common.interaction.text.InteractionPage;
-import com.oreilly.common.interaction.text.interfaces.HasTitle;
-import com.oreilly.permitsigns.PriceRecord;
+import com.oreilly.common.interaction.text.TitledInteractionPage;
 import com.oreilly.permitsigns.PermitSigns;
+import com.oreilly.permitsigns.PriceRecord;
 
 
 // TODO: Highlight the "Page x of y"
 
 // views the economic data for the selected PermitAlias (via SelectPermitAlias)
-public class ViewEconomicData extends InteractionPage implements HasTitle {
+public class ViewEconomicData extends TitledInteractionPage {
 	
 	private static final String PAGE_DATA = "view_economic_data_pages";
 	private static final String PAGE_NUMBER = "view_economic_data_page_number";
@@ -19,10 +19,9 @@ public class ViewEconomicData extends InteractionPage implements HasTitle {
 	private static final int MAX_LINES = InteractionPage.MAX_LINES - 7;
 	
 	
-	@Override
-	public String getTitle() {
-		// TODO Auto-generated method stub
-		return "Sign Price Details";
+	public ViewEconomicData() {
+		super();
+		defaultTitle = "Sign Price Details";
 	}
 	
 	

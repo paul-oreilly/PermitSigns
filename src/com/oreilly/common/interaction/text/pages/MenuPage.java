@@ -6,6 +6,7 @@ import java.util.Iterator;
 
 import com.oreilly.common.interaction.text.Interaction;
 import com.oreilly.common.interaction.text.InteractionPage;
+import com.oreilly.common.interaction.text.TitledInteractionPage;
 import com.oreilly.common.interaction.text.formatter.Highlighter;
 import com.oreilly.common.interaction.text.interfaces.Choices;
 import com.oreilly.common.interaction.text.interfaces.HighlightClient;
@@ -13,7 +14,7 @@ import com.oreilly.common.interaction.text.validator.ChoicesValidator;
 import com.oreilly.permitme.PermitMe;
 
 
-abstract public class MenuPage extends InteractionPage implements HighlightClient, Choices {
+abstract public class MenuPage extends TitledInteractionPage implements HighlightClient, Choices {
 	
 	public HashMap< String, InteractionPage[] > choices = new HashMap< String, InteractionPage[] >();
 	public boolean loopbackOnCompletion = false;

@@ -1,10 +1,10 @@
 package com.oreilly.permitsigns.interactions.pricing;
 
 import com.oreilly.common.interaction.text.Interaction;
-import com.oreilly.common.interaction.text.InteractionPage;
+import com.oreilly.common.interaction.text.TitledInteractionPage;
 
 
-public class EditRatioPricing extends InteractionPage {
+public class EditRatioPricing extends TitledInteractionPage {
 	
 	@Override
 	public String getDisplayText( Interaction interaction ) {

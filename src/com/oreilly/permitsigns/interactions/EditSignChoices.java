@@ -1,12 +1,11 @@
 package com.oreilly.permitsigns.interactions;
 
 import com.oreilly.common.interaction.text.Interaction;
-import com.oreilly.common.interaction.text.interfaces.HasTitle;
 import com.oreilly.common.interaction.text.pages.MenuPage;
 import com.oreilly.permitsigns.SignRecord;
 
 
-public class EditSignChoices extends MenuPage implements HasTitle {
+public class EditSignChoices extends MenuPage {
 	
 	public EditSignChoices() {
 		super();
@@ -16,6 +15,7 @@ public class EditSignChoices extends MenuPage implements HasTitle {
 		withAlias( "alias", "2" );
 		validationFailedMessage = "Please type one of the highlighted options to proceed";
 		loopbackOnCompletion = true;
+		defaultTitle = "Sign Editing Assistant";
 	}
 	
 	
@@ -28,12 +28,6 @@ public class EditSignChoices extends MenuPage implements HasTitle {
 				"Which action would you like to take?\n" +
 				"  1. Change the type of sign\n" +
 				"  2. Change the permit alias of the sign (linked permit)";
-	}
-	
-	
-	@Override
-	public String getTitle() {
-		return "Sign Editing Assistant";
 	}
 	
 }

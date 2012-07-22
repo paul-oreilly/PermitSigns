@@ -4,9 +4,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import com.oreilly.common.interaction.text.Interaction;
-import com.oreilly.common.interaction.text.InteractionPage;
+import com.oreilly.common.interaction.text.TitledInteractionPage;
 import com.oreilly.common.interaction.text.formatter.Highlighter;
-import com.oreilly.common.interaction.text.interfaces.HasTitle;
 import com.oreilly.common.interaction.text.interfaces.HighlightClient;
 import com.oreilly.permitsigns.Config;
 import com.oreilly.permitsigns.PermitSigns;
@@ -15,13 +14,14 @@ import com.oreilly.permitsigns.data.SignHeader;
 import com.oreilly.permitsigns.interactions.validators.ValidSignType;
 
 
-public class EditSignType extends InteractionPage implements HasTitle, HighlightClient {
+public class EditSignType extends TitledInteractionPage implements HighlightClient {
 	
 	public EditSignType() {
 		super();
 		withFormatter( new Highlighter( this ) );
 		withValidator( new ValidSignType() );
 		validationFailedMessage = "Unable to find a valid header based on %input";
+		defaultTitle = "Edit Sign Type";
 	}
 	
 	
@@ -61,12 +61,6 @@ public class EditSignType extends InteractionPage implements HasTitle, Highlight
 		PermitSigns.instance.signs.refresh( sign );
 		Config.saveSign( sign );
 		return "Sign type updated to " + sign.signType.toString() + " with display " + s;
-	}
-	
-	
-	@Override
-	public String getTitle() {
-		return "Edit Sign Type";
 	}
 	
 	

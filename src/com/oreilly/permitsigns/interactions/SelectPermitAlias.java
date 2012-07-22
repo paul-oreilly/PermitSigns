@@ -1,8 +1,7 @@
 package com.oreilly.permitsigns.interactions;
 
 import com.oreilly.common.interaction.text.Interaction;
-import com.oreilly.common.interaction.text.InteractionPage;
-import com.oreilly.common.interaction.text.interfaces.HasTitle;
+import com.oreilly.common.interaction.text.TitledInteractionPage;
 import com.oreilly.permitme.PermitMe;
 import com.oreilly.permitme.record.Permit;
 
@@ -10,13 +9,14 @@ import com.oreilly.permitme.record.Permit;
 // TODO: Move to PermitME
 // TODO: Add a selection helper when no permit matches, with a list of the top x suggestions
 
-public class SelectPermitAlias extends InteractionPage implements HasTitle {
+public class SelectPermitAlias extends TitledInteractionPage {
 	
 	static public final String CONTEXT_SELECTED_ALIAS = "selectedPermitAlias";
 	
 	
 	public SelectPermitAlias() {
 		super();
+		defaultTitle = "Select a permit alias";
 	}
 	
 	
@@ -39,9 +39,4 @@ public class SelectPermitAlias extends InteractionPage implements HasTitle {
 		}
 	}
 	
-	
-	@Override
-	public String getTitle() {
-		return "Select a permit alias";
-	}
 }

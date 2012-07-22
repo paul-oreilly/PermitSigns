@@ -191,9 +191,9 @@ public class Interaction {
 		currentPage.style.putAll( style );
 		String currentDisplay = currentPage.getDisplayText( this );
 		if ( currentPage.formatter != null )
-			currentDisplay = currentPage.formatter.startFormatting( currentDisplay, currentPage );
+			currentDisplay = currentPage.formatter.startFormatting( currentDisplay, currentPage, this );
 		if ( formatter != null )
-			currentDisplay = formatter.startFormatting( currentDisplay, currentPage );
+			currentDisplay = formatter.startFormatting( currentDisplay, currentPage, this );
 		// send the display to the user
 		user.sendMessage( currentDisplay.split( "\n" ) );
 	}

@@ -13,6 +13,7 @@ public class EditSignAlias extends SelectPermitAlias {
 		// add ValidPermitAlias to PermitMe, use here.
 		// add validation failed message.
 		
+		defaultTitle = "Edit Sign Alias";
 	}
 	
 	
@@ -42,9 +43,4 @@ public class EditSignAlias extends SelectPermitAlias {
 		return superResult;
 	}
 	
-	
-	@Override
-	public String getTitle() {
-		return "Edit Sign Alias";
-	}
 }

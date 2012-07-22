@@ -1,7 +1,6 @@
 package com.oreilly.permitsigns.interactions;
 
 import com.oreilly.common.interaction.text.Interaction;
-import com.oreilly.common.interaction.text.interfaces.HasTitle;
 import com.oreilly.common.interaction.text.pages.MenuPage;
 import com.oreilly.permitsigns.PermitSigns;
 import com.oreilly.permitsigns.PriceRecord;
@@ -13,7 +12,7 @@ import com.oreilly.permitsigns.interactions.pricing.EditRounding;
 import com.oreilly.permitsigns.interactions.pricing.EditVariablePricing;
 
 
-public class EditEconomicData extends MenuPage implements HasTitle {
+public class EditEconomicData extends MenuPage {
 	
 	public EditEconomicData() {
 		super();
@@ -35,13 +34,7 @@ public class EditEconomicData extends MenuPage implements HasTitle {
 		withAlias( "ratio", "6" );
 		validationFailedMessage = "Please type one of the highlighted options to proceed";
 		loopbackOnCompletion = true;
-	}
-	
-	
-	@Override
-	public String getTitle() {
-		// TODO Auto-generated method stub
-		return "Sign Price Editing Assistant";
+		defaultTitle = "Sign Price Editing Assistant";
 	}
 	
 	

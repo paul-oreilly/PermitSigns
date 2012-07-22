@@ -1,14 +1,19 @@
 package com.oreilly.permitsigns.interactions.pricing;
 
 import com.oreilly.common.interaction.text.Interaction;
-import com.oreilly.common.interaction.text.InteractionPage;
-import com.oreilly.common.interaction.text.interfaces.HasTitle;
+import com.oreilly.common.interaction.text.TitledInteractionPage;
 import com.oreilly.permitsigns.PermitSigns;
 import com.oreilly.permitsigns.PriceRecord;
 import com.oreilly.permitsigns.interactions.SelectPermitAlias;
 
 
-public class EditMinPrice extends InteractionPage implements HasTitle {
+public class EditMinPrice extends TitledInteractionPage {
+	
+	public EditMinPrice() {
+		super();
+		defaultTitle = "Edit Minimum Price";
+	}
+	
 	
 	@Override
 	public String getDisplayText( Interaction interaction ) {
@@ -48,12 +53,6 @@ public class EditMinPrice extends InteractionPage implements HasTitle {
 		// change the value
 		priceData.setMinPrice( newPrice );
 		return "Minimum price for " + permitAlias + " is now " + newPrice;
-	}
-	
-	
-	@Override
-	public String getTitle() {
-		return "Edit Minimum Price";
 	}
 	
 }

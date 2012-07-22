@@ -1,11 +1,10 @@
 package com.oreilly.permitsigns.interactions;
 
 import com.oreilly.common.interaction.text.Interaction;
-import com.oreilly.common.interaction.text.interfaces.HasTitle;
 import com.oreilly.common.interaction.text.pages.MenuPage;
 
 
-public class AdminChoices extends MenuPage implements HasTitle {
+public class AdminChoices extends MenuPage {
 	
 	public AdminChoices() {
 		// TODO: Extend "WithChoice" to take a chain - so can "SelectEconomicData" then "EditEconomicData"
@@ -16,6 +15,7 @@ public class AdminChoices extends MenuPage implements HasTitle {
 		withAlias( "price", "permit" );
 		validationFailedMessage = "Please type one of the highlighted options to proceed";
 		loopbackOnCompletion = false;
+		defaultTitle = "Admin Options for Permit Signs";
 	}
 	
 	
@@ -26,11 +26,5 @@ public class AdminChoices extends MenuPage implements HasTitle {
 				"(To edit sign data, hold sneak while right clicking the sign)\n" +
 				"  1. View / edit the price of a permit\n";
 		
-	}
-	
-	
-	@Override
-	public String getTitle() {
-		return "Admin Options for Permit Signs";
 	}
 }

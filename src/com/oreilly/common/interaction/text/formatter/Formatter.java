@@ -1,5 +1,6 @@
 package com.oreilly.common.interaction.text.formatter;
 
+import com.oreilly.common.interaction.text.Interaction;
 import com.oreilly.common.interaction.text.InteractionPage;
 
 
@@ -19,14 +20,14 @@ abstract public class Formatter {
 	}
 	
 	
-	public String startFormatting( String s, InteractionPage page ) {
-		s = format( s, page );
+	public String startFormatting( String s, InteractionPage page, Interaction interaction ) {
+		s = format( s, page, interaction );
 		if ( nextInChain != null )
-			s = nextInChain.startFormatting( s, page );
+			s = nextInChain.startFormatting( s, page, interaction );
 		return s;
 	}
 	
 	
-	abstract protected String format( String s, InteractionPage page );
+	abstract protected String format( String s, InteractionPage page, Interaction interaction );
 	
 }
