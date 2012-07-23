@@ -57,20 +57,20 @@ public class Prices {
 		for ( PriceRecord data : economicData.values() ) {
 			boolean dataChange = false;
 			// update ratio decay data if required
-			if ( data.fixedRatioDecayDefined ) {
+			if ( data.timeFactorDefined ) {
 				data.ticksSinceRatioDecayUpdated += scheduleTicksIntervalForTimeAdjustments;
-				if ( data.ticksSinceRatioDecayUpdated / 20 > data.fixedRatioDecayInterval ) {
-					data.ticksSinceRatioDecayUpdated -= 20 * data.fixedRatioDecayInterval;
-					data.variablePrice *= data.fixedRatioDecayFactor;
+				if ( data.ticksSinceRatioDecayUpdated > data.timeFactorInterval ) {
+					data.ticksSinceRatioDecayUpdated -= data.timeFactorInterval;
+					data.variablePrice *= data.timeFactor;
 					dataChange = true;
 				}
 			}
 			// update fixed decay data if required
-			if ( data.fixedTimeDecayDefined ) {
+			if ( data.timeAmountDefined ) {
 				data.ticksSinceTimeDecayUpdated += scheduleTicksIntervalForTimeAdjustments;
-				if ( data.ticksSinceTimeDecayUpdated / 20 > data.fixedTimeDecayInterval ) {
-					data.ticksSinceTimeDecayUpdated -= 20 * data.fixedTimeDecayInterval;
-					data.variablePrice -= data.fixedTimeDecayAmount;
+				if ( data.ticksSinceTimeDecayUpdated > data.timeAmountInterval ) {
+					data.ticksSinceTimeDecayUpdated -= data.timeAmountInterval;
+					data.variablePrice -= data.timeAmount;
 					dataChange = true;
 				}
 			}
@@ -176,6 +176,8 @@ public class Prices {
 		PriceRecord data = economicData.get( permitAlias );
 		if ( data.purchaseFactorDefined )
 			data.variablePrice *= data.purchaseFactor;
+		if ( data.purchaseAmountDefined )
+			data.variablePrice += data.purchaseAmount;
 		updateRatios( data );
 		updatePrice( permitAlias );
 	}
@@ -264,7 +266,7 @@ public class Prices {
 	
 	protected boolean updatePrice( PriceRecord data, boolean forceSave ) {
 		double result;
-		boolean dynamicPriceDefined = ( data.purchaseFactorDefined | data.fixedRatioDecayDefined | data.fixedTimeDecayDefined );
+		boolean dynamicPriceDefined = ( data.purchaseFactorDefined | data.timeFactorDefined | data.timeAmountDefined );
 		// if only a base price is defined, then the price is the base price...
 		if ( !( data.ratioDefined | dynamicPriceDefined ) ) {
 			result = roundToFactor( data.basePrice, data.roundingFactor );

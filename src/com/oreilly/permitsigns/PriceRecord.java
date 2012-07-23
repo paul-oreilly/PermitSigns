@@ -21,15 +21,20 @@ public class PriceRecord {
 	
 	// purchase and decay system
 	protected double variablePrice = 0;
-	protected boolean fixedTimeDecayDefined = false;
-	protected double fixedTimeDecayAmount = 0;
-	protected int fixedTimeDecayInterval = 0; // in seconds
+	// time based amount of a set value..
+	protected boolean timeAmountDefined = false;
+	protected double timeAmount = 0;
+	protected int timeAmountInterval = 0; // in ticks
+	// time based factor (multiplied)
+	protected boolean timeFactorDefined = false;
+	protected double timeFactor = 1;
+	protected int timeFactorInterval = 0; // in ticks
+	// purchase based set value
+	protected boolean purchaseAmountDefined = false;
+	protected double purchaseAmount = 0;
+	// purchase based factor (multiplied)
 	protected boolean purchaseFactorDefined = false;
 	protected double purchaseFactor = 1;
-	// TODO: Add "PurchaseDelta" for fixed amount
-	protected boolean fixedRatioDecayDefined = false;
-	protected double fixedRatioDecayFactor = 1;
-	protected int fixedRatioDecayInterval = 0; // in seconds
 	
 	// ratio based data - by alias
 	protected boolean ratioDefined = false;
@@ -58,19 +63,22 @@ public class PriceRecord {
 		result.minPriceDefined = section.contains( EconomicDataConfigConstant.minPrice );
 		if ( result.minPriceDefined )
 			result.minPrice = section.getDouble( EconomicDataConfigConstant.minPrice );
-		result.variablePrice = section.getDouble( EconomicDataConfigConstant.currentDecayPrice, basePrice );
-		result.fixedTimeDecayDefined = section.contains( EconomicDataConfigConstant.fixedTimeDecreaseAmount );
-		if ( result.fixedTimeDecayDefined ) {
-			result.fixedTimeDecayAmount = section.getDouble( EconomicDataConfigConstant.fixedTimeDecreaseAmount );
-			result.fixedTimeDecayInterval = section.getInt( EconomicDataConfigConstant.fixedTimeDecreaseInterval, 3600 );
+		result.variablePrice = section.getDouble( EconomicDataConfigConstant.variablePrice, basePrice );
+		result.timeAmountDefined = section.contains( EconomicDataConfigConstant.timeAmount );
+		if ( result.timeAmountDefined ) {
+			result.timeAmount = section.getDouble( EconomicDataConfigConstant.timeAmount );
+			result.timeAmountInterval = section.getInt( EconomicDataConfigConstant.timeAmountInterval, 3600 );
 		}
 		result.purchaseFactorDefined = section.contains( EconomicDataConfigConstant.purchaseFactor );
 		if ( result.purchaseFactorDefined )
 			result.purchaseFactor = section.getDouble( EconomicDataConfigConstant.purchaseFactor );
-		result.fixedRatioDecayDefined = section.contains( EconomicDataConfigConstant.fixedRatioDecayFactor );
-		if ( result.fixedRatioDecayDefined ) {
-			result.fixedRatioDecayFactor = section.getDouble( EconomicDataConfigConstant.fixedRatioDecayFactor );
-			result.fixedRatioDecayInterval = section.getInt( EconomicDataConfigConstant.fixedRatioDecayInterval, 3600 );
+		result.purchaseAmountDefined = section.contains( EconomicDataConfigConstant.purchaseAmount );
+		if ( result.purchaseAmountDefined )
+			result.purchaseAmount = section.getDouble( EconomicDataConfigConstant.purchaseAmount );
+		result.timeFactorDefined = section.contains( EconomicDataConfigConstant.timeFactor );
+		if ( result.timeFactorDefined ) {
+			result.timeFactor = section.getDouble( EconomicDataConfigConstant.timeFactor );
+			result.timeFactorInterval = section.getInt( EconomicDataConfigConstant.timeFactorInterval, 3600 );
 		}
 		if ( section.contains( EconomicDataConfigConstant.ratioHeader ) ) {
 			List< String > ratioData = section.getStringList( EconomicDataConfigConstant.ratioHeader );
@@ -148,45 +156,65 @@ public class PriceRecord {
 	
 	
 	public boolean getVariablePriceDefined() {
-		return ( fixedTimeDecayDefined | purchaseFactorDefined | fixedRatioDecayDefined );
+		return ( timeAmountDefined | purchaseFactorDefined | timeFactorDefined | purchaseAmountDefined );
 	}
 	
 	
 	public boolean getTimeAmountDefined() {
-		return fixedTimeDecayDefined;
+		return timeAmountDefined;
 	}
 	
 	
 	public void setTimeAmountDefined( boolean newValue ) {
-		fixedTimeDecayDefined = newValue;
+		timeAmountDefined = newValue;
 		PermitSigns.instance.prices.priceRecordChange( this );
 	}
 	
 	
 	public double getTimeAmount() {
-		return fixedTimeDecayAmount;
+		return timeAmount;
 	}
 	
 	
 	public void setTimeAmount( double newValue ) {
-		fixedTimeDecayAmount = newValue;
-		fixedTimeDecayDefined = true;
+		timeAmount = newValue;
+		timeAmountDefined = true;
 		PermitSigns.instance.prices.priceRecordChange( this );
 	}
 	
 	
 	public int getTimeAmountInterval() {
-		return fixedTimeDecayInterval;
+		return timeAmountInterval;
 	}
 	
 	
 	public void setTimeAmountInterval( int ticks ) {
-		fixedTimeDecayInterval = ticks;
+		timeAmountInterval = ticks;
 		PermitSigns.instance.prices.priceRecordChange( this );
 	}
 	
 	
-	// TODO: Add fixed amonut, and then meta boolean for either
+	public boolean getPurchaseAmountDefined() {
+		return purchaseAmountDefined;
+	}
+	
+	
+	public void setPurchaseAmountDefined( boolean newValue ) {
+		purchaseAmountDefined = newValue;
+		PermitSigns.instance.prices.priceRecordChange( this );
+	}
+	
+	
+	public double getPurchaseAmount() {
+		return purchaseAmount;
+	}
+	
+	
+	public void setPurchaseAmonut( double newValue ) {
+		purchaseAmount = newValue;
+		PermitSigns.instance.prices.priceRecordChange( this );
+	}
+	
 	
 	public boolean getPurchaseFactorDefined() {
 		return purchaseFactorDefined;
@@ -212,35 +240,35 @@ public class PriceRecord {
 	
 	
 	public boolean getTimeFactorDefined() {
-		return fixedRatioDecayDefined;
+		return timeFactorDefined;
 	}
 	
 	
 	public void setTimeFactorDefined( boolean newValue ) {
-		fixedRatioDecayDefined = newValue;
+		timeFactorDefined = newValue;
 		PermitSigns.instance.prices.priceRecordChange( this );
 	}
 	
 	
 	public double getTimeFactor() {
-		return fixedRatioDecayFactor;
+		return timeFactor;
 	}
 	
 	
 	public void setTimeFactor( double newFactor ) {
-		fixedRatioDecayFactor = newFactor;
-		fixedRatioDecayDefined = true;
+		timeFactor = newFactor;
+		timeFactorDefined = true;
 		PermitSigns.instance.prices.priceRecordChange( this );
 	}
 	
 	
 	public int getTimeFactorInterval() {
-		return fixedRatioDecayInterval;
+		return timeFactorInterval;
 	}
 	
 	
 	public void setTimeFactorInterval( int ticks ) {
-		fixedRatioDecayInterval = ticks;
+		timeFactorInterval = ticks;
 		PermitSigns.instance.prices.priceRecordChange( this );
 	}
 	
@@ -280,17 +308,19 @@ public class PriceRecord {
 			config.set( path + "." + EconomicDataConfigConstant.maxPrice, maxPrice );
 		if ( minPriceDefined )
 			config.set( path + "." + EconomicDataConfigConstant.minPrice, minPrice );
-		config.set( path + "." + EconomicDataConfigConstant.currentDecayPrice, variablePrice );
-		if ( fixedTimeDecayDefined ) {
-			config.set( path + "." + EconomicDataConfigConstant.fixedTimeDecreaseAmount, fixedTimeDecayAmount );
-			config.set( path + "." + EconomicDataConfigConstant.fixedTimeDecreaseInterval, fixedTimeDecayInterval );
+		config.set( path + "." + EconomicDataConfigConstant.variablePrice, variablePrice );
+		if ( timeAmountDefined ) {
+			config.set( path + "." + EconomicDataConfigConstant.timeAmount, timeAmount );
+			config.set( path + "." + EconomicDataConfigConstant.timeAmountInterval, timeAmountInterval );
+		}
+		if ( timeFactorDefined ) {
+			config.set( path + "." + EconomicDataConfigConstant.timeFactor, timeFactor );
+			config.set( path + "." + EconomicDataConfigConstant.timeFactorInterval, timeFactorInterval );
 		}
 		if ( purchaseFactorDefined )
 			config.set( path + "." + EconomicDataConfigConstant.purchaseFactor, purchaseFactor );
-		if ( fixedRatioDecayDefined ) {
-			config.set( path + "." + EconomicDataConfigConstant.fixedRatioDecayFactor, fixedRatioDecayFactor );
-			config.set( path + "." + EconomicDataConfigConstant.fixedRatioDecayInterval, fixedRatioDecayInterval );
-		}
+		if ( purchaseAmountDefined )
+			config.set( path + "." + EconomicDataConfigConstant.purchaseAmount, purchaseAmount );
 		LinkedList< String > ratioData = new LinkedList< String >();
 		for ( EconomicRatio ratio : ratios.values() ) {
 			String asString = ratio.toString();
@@ -333,19 +363,18 @@ public class PriceRecord {
 		// rounding factor
 		result += bodyPrefix + "Prices are always rounded to the nearest " + roundingFactor + "\n\n";
 		// variable pricing
-		if ( purchaseFactorDefined | fixedTimeDecayDefined | fixedRatioDecayDefined ) {
+		if ( getVariablePriceDefined() ) {
 			result += bodyPrefix + "Variable pricing is exists ( value of " + withRounding( variablePrice ) + ")\n";
 			if ( purchaseFactorDefined )
-				result += bodyPrefix + "  A \'purchase factor\' exists:\n" +
-						bodyPrefix + "  - When pruchased, the price is multiplied by " + purchaseFactor + "\n";
-			if ( fixedTimeDecayDefined )
-				result += bodyPrefix + "  A fixed time based adjustment exists:\n" +
-						bodyPrefix + "  - Every " + fixedTimeDecayInterval + " seconds" +
-						", the price will be adjusted by " + fixedTimeDecayAmount + "\n";
-			if ( fixedRatioDecayDefined )
-				result += bodyPrefix + "  A ratio time based adjustment exists:\n" +
-						bodyPrefix + "  - Every " + fixedRatioDecayInterval + " seconds" +
-						", the price will be multiplied by " + fixedRatioDecayFactor + "\n";
+				result += bodyPrefix + "  On purchase, the price is multiplied by " + purchaseFactor + "\n";
+			if ( purchaseAmountDefined )
+				result += bodyPrefix + "  On purchase, the price is adjusted by " + purchaseAmount + "\n";
+			if ( timeAmountDefined )
+				result += bodyPrefix + "  Every " + timeAmountInterval + " seconds" +
+						", the price is adjusted by " + timeAmount + "\n";
+			if ( timeFactorDefined )
+				result += bodyPrefix + "  Every " + timeFactorInterval + " seconds" +
+						", the price is be multiplied by " + timeFactor + "\n";
 		} else
 			result += bodyPrefix + "No Variable pricing.\n";
 		// ratio pricing
@@ -376,11 +405,12 @@ class EconomicDataConfigConstant {
 	static public final String minPrice = "price.min";
 	static public final String maxPrice = "price.max";
 	static public final String roundingFactor = "price.roundingFactor";
-	static public final String currentDecayPrice = "decay.currentPrice";
-	static public final String fixedTimeDecreaseAmount = "decay.time.amount";
-	static public final String fixedTimeDecreaseInterval = "decay.time.seconds";
-	static public final String fixedRatioDecayFactor = "decay.ratio.factor";
-	static public final String fixedRatioDecayInterval = "decay.ratio.seconds";
-	static public final String purchaseFactor = "decay.purchase.factor";
-	static public final String ratioHeader = "ratios";
+	static public final String variablePrice = "price.variable.currentPrice";
+	static public final String timeAmount = "price.variable.time.amount";
+	static public final String timeAmountInterval = "price.variable.time.ticks";
+	static public final String timeFactor = "price.variable.factor.factor";
+	static public final String timeFactorInterval = "price.variable.factor.ticks";
+	static public final String purchaseFactor = "price.variable.purchase.factor";
+	static public final String purchaseAmount = "price.variable.purchase.amount";
+	static public final String ratioHeader = "price.ratios";
 }
