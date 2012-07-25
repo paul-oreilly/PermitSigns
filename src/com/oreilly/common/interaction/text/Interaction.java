@@ -12,10 +12,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.plugin.Plugin;
 
+import com.oreilly.common.interaction.text.error.ContextDataRequired;
+import com.oreilly.common.interaction.text.error.GeneralDisplayError;
+import com.oreilly.common.interaction.text.error.InterfaceDependencyError;
+import com.oreilly.common.interaction.text.error.ValidationFailedError;
 import com.oreilly.common.interaction.text.formatter.Formatter;
 import com.oreilly.common.interaction.text.validator.Validator;
-import com.oreilly.common.interaction.text.validator.error.InterfaceDependencyError;
-import com.oreilly.common.interaction.text.validator.error.ValidationFailedError;
 
 
 public class Interaction {
@@ -111,8 +113,10 @@ public class Interaction {
 		// return to the previous page, if input matches one of the return strings
 		if ( returnStrings.contains( universalInput ) ) {
 			pages.add( 0, currentPage );
-			currentPage = history.remove( history.size() - 1 );
-			display();
+			if ( history.size() > 1 ) {
+				currentPage = history.remove( history.size() - 1 );
+				display();
+			}
 			return;
 		}
 		// exit the conversation if there is no current page
@@ -124,9 +128,9 @@ public class Interaction {
 			// validate input
 			Object validatedInput = input;
 			if ( validator != null )
-				validator.startValidation( validatedInput, currentPage );
+				validatedInput = validator.startValidation( validatedInput, currentPage );
 			if ( currentPage.validator != null )
-				currentPage.validator.startValidation( validatedInput, currentPage );
+				validatedInput = currentPage.validator.startValidation( validatedInput, currentPage );
 			// pass input to the page to take action on
 			String reply = currentPage.acceptValidatedInput( this, validatedInput );
 			if ( reply != null )
@@ -154,6 +158,20 @@ public class Interaction {
 				sendValidationError( error.message, input );
 		} catch ( InterfaceDependencyError error ) {
 			user.sendMessage( "Internal error - unmet interface dependency " + error.interfaceRequired );
+		} catch ( ContextDataRequired error ) {
+			// show the previous page, then an error about context
+			if ( history.size() > 1 ) {
+				currentPage = history.remove( history.size() - 1 );
+				display();
+			}
+			user.sendMessage( ChatColor.DARK_RED + "ERROR: Unable to display page, as required context " +
+					error.key + "(" + error.classType + ") does not exist" );
+		} catch ( GeneralDisplayError error ) {
+			if ( history.size() > 1 ) {
+				currentPage = history.remove( history.size() - 1 );
+				display();
+			}
+			user.sendMessage( ChatColor.DARK_RED + "ERROR: " + error.reason );
 		}
 	}
 	
@@ -189,13 +207,29 @@ public class Interaction {
 			return;
 		}
 		currentPage.style.putAll( style );
-		String currentDisplay = currentPage.getDisplayText( this );
-		if ( currentPage.formatter != null )
-			currentDisplay = currentPage.formatter.startFormatting( currentDisplay, currentPage, this );
-		if ( formatter != null )
-			currentDisplay = formatter.startFormatting( currentDisplay, currentPage, this );
-		// send the display to the user
-		user.sendMessage( currentDisplay.split( "\n" ) );
+		try {
+			String currentDisplay = currentPage.getDisplayText( this );
+			if ( currentPage.formatter != null )
+				currentDisplay = currentPage.formatter.startFormatting( currentDisplay, currentPage, this );
+			if ( formatter != null )
+				currentDisplay = formatter.startFormatting( currentDisplay, currentPage, this );
+			// send the display to the user
+			user.sendMessage( currentDisplay.split( "\n" ) );
+		} catch ( ContextDataRequired error ) {
+			// show the previous page, then an error about context
+			if ( history.size() > 1 ) {
+				currentPage = history.remove( history.size() - 1 );
+				display();
+			}
+			user.sendMessage( ChatColor.DARK_RED + "ERROR: Unable to display next page, as required context " +
+					error.key + "(" + error.classType + ") does not exist" );
+		} catch ( GeneralDisplayError error ) {
+			if ( history.size() > 1 ) {
+				currentPage = history.remove( history.size() - 1 );
+				display();
+			}
+			user.sendMessage( ChatColor.DARK_RED + "ERROR: " + error.reason );
+		}
 	}
 	
 	
@@ -304,6 +338,34 @@ public class Interaction {
 	public Interaction withStyles( HashMap< String, Object > source ) {
 		style.putAll( source );
 		return this;
+	}
+	
+	
+	// Helper functions...
+	
+	public < T > T getContextData( Class< T > tClass, Interaction interaction, String key ) throws ContextDataRequired {
+		return getContextData( tClass, interaction, key, false );
+	}
+	
+	
+	@SuppressWarnings("unchecked")
+	public < T > T getContextData( Class< T > tClass, Interaction interaction, String key, boolean throwError )
+			throws ContextDataRequired {
+		Object obj = interaction.context.get( key );
+		if ( obj == null ) {
+			if ( throwError )
+				throw new ContextDataRequired( key, tClass );
+			else
+				return null;
+		}
+		if ( obj.getClass().isAssignableFrom( tClass ) )
+			return (T)obj;
+		else {
+			if ( throwError )
+				throw new ContextDataRequired( key, tClass );
+			else
+				return null;
+		}
 	}
 	
 	

@@ -76,6 +76,17 @@ public class PermitSigns extends JavaPlugin {
 	}
 	
 	
+	@Override
+	public void onDisable() {
+		
+		PermitMe.log.info( "[PermitSigns] Disabling..." );
+		
+		//save sign data
+		signs.saveAll();
+		prices.saveAll();
+	}
+	
+	
 	public void permitMeReady() {
 		tracker.permitMeReady();
 		signs.refreshAllSigns();

@@ -8,21 +8,19 @@ import com.oreilly.common.interaction.text.validator.DoubleValidator;
 import com.oreilly.permitsigns.interactions.pricing.helpers.PriceDataRetriever;
 
 
-public class EditMaxPrice extends TitledInteractionPage {
+public class EditPurchaseFactor extends TitledInteractionPage {
 	
-	public EditMaxPrice() {
-		super();
+	public EditPurchaseFactor() {
 		withValidator( new DoubleValidator() );
-		defaultTitle = "Edit Max Price";
 	}
 	
 	
 	@Override
 	public String getDisplayText( Interaction interaction ) throws ContextDataRequired, GeneralDisplayError {
 		PriceDataRetriever helper = new PriceDataRetriever( interaction );
-		return "The current maximum price for " + helper.currentPriceAlias + " is " +
-				helper.currentPriceRecord.getMaxPrice() + ".\n" +
-				"Please enter a new value, or \'exit\' to quit";
+		return "The current amount multiplied on purchase is " +
+				helper.currentPriceRecord.getPurchaseFactor() + "\n" +
+				"Please enter the new factor:";
 	}
 	
 	
@@ -30,10 +28,10 @@ public class EditMaxPrice extends TitledInteractionPage {
 	public String acceptValidatedInput( Interaction interaction, Object data ) throws ContextDataRequired,
 			GeneralDisplayError {
 		PriceDataRetriever helper = new PriceDataRetriever( interaction );
-		// change the value - safe cast, due to validator
-		Double newPrice = (Double)data;
-		helper.currentPriceRecord.setMaxPrice( newPrice );
-		return "Maximum price for " + helper.currentPriceAlias + " is now " + newPrice;
+		// since we have a validator, we can safely cast object to Double
+		Double newFactor = (Double)data;
+		helper.currentPriceRecord.setPurchaseFactor( newFactor );
+		return "The purchase factor has been updated to " + newFactor + "\n";
 	}
 	
 }

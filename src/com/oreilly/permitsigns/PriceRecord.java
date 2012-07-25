@@ -189,7 +189,10 @@ public class PriceRecord {
 	
 	
 	public void setTimeAmountInterval( int ticks ) {
+		// DEBUG:
+		System.out.println( "DEBUG: Setting time amount interval to " + ticks );
 		timeAmountInterval = ticks;
+		timeFactorDefined = true;
 		PermitSigns.instance.prices.priceRecordChange( this );
 	}
 	
@@ -212,6 +215,7 @@ public class PriceRecord {
 	
 	public void setPurchaseAmonut( double newValue ) {
 		purchaseAmount = newValue;
+		purchaseAmountDefined = true;
 		PermitSigns.instance.prices.priceRecordChange( this );
 	}
 	
@@ -268,7 +272,10 @@ public class PriceRecord {
 	
 	
 	public void setTimeFactorInterval( int ticks ) {
+		// DEBUG:
+		System.out.println( "DEBUG: Updating time factor interval to " + ticks );
 		timeFactorInterval = ticks;
+		timeFactorDefined = true;
 		PermitSigns.instance.prices.priceRecordChange( this );
 	}
 	
@@ -296,7 +303,24 @@ public class PriceRecord {
 	}
 	
 	
-	// TODO: add and remove price ratio functions
+	public void removePriceRatio( EconomicRatio ratio ) {
+		ratios.remove( ratio.otherAlias );
+		PermitSigns.instance.prices.ratioDataChanged( this );
+	}
+	
+	
+	public void updatePriceRatios() {
+		PermitSigns.instance.prices.ratioDataChanged( this );
+	}
+	
+	
+	public void addNewPriceRatio( EconomicRatio ratio ) {
+		if ( ratio != null ) {
+			ratios.put( ratio.otherAlias, ratio );
+			PermitSigns.instance.prices.ratioDataChanged( this );
+		}
+	}
+	
 	
 	// IO Functions...
 	
@@ -370,10 +394,10 @@ public class PriceRecord {
 			if ( purchaseAmountDefined )
 				result += bodyPrefix + "  On purchase, the price is adjusted by " + purchaseAmount + "\n";
 			if ( timeAmountDefined )
-				result += bodyPrefix + "  Every " + timeAmountInterval + " seconds" +
+				result += bodyPrefix + "  Every " + timeAmountInterval + " ticks" +
 						", the price is adjusted by " + timeAmount + "\n";
 			if ( timeFactorDefined )
-				result += bodyPrefix + "  Every " + timeFactorInterval + " seconds" +
+				result += bodyPrefix + "  Every " + timeFactorInterval + " ticks" +
 						", the price is be multiplied by " + timeFactor + "\n";
 		} else
 			result += bodyPrefix + "No Variable pricing.\n";
@@ -405,11 +429,11 @@ class EconomicDataConfigConstant {
 	static public final String minPrice = "price.min";
 	static public final String maxPrice = "price.max";
 	static public final String roundingFactor = "price.roundingFactor";
-	static public final String variablePrice = "price.variable.currentPrice";
-	static public final String timeAmount = "price.variable.time.amount";
-	static public final String timeAmountInterval = "price.variable.time.ticks";
-	static public final String timeFactor = "price.variable.factor.factor";
-	static public final String timeFactorInterval = "price.variable.factor.ticks";
+	static public final String variablePrice = "price.variablePrice";
+	static public final String timeAmount = "price.variable.time.amount.value";
+	static public final String timeAmountInterval = "price.variable.time.amount.ticks";
+	static public final String timeFactor = "price.variable.time.factor.value";
+	static public final String timeFactorInterval = "price.variable.time.factor.ticks";
 	static public final String purchaseFactor = "price.variable.purchase.factor";
 	static public final String purchaseAmount = "price.variable.purchase.amount";
 	static public final String ratioHeader = "price.ratios";

@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.lang.WordUtils;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -17,10 +18,11 @@ import com.oreilly.common.interaction.text.InteractionFactory;
 import com.oreilly.common.interaction.text.formatter.Border;
 import com.oreilly.common.interaction.text.formatter.ClearChat;
 import com.oreilly.permitme.PermitMe;
+import com.oreilly.permitme.record.Permit;
 import com.oreilly.permitme.record.PermitPlayer;
 import com.oreilly.permitsigns.data.SignHeader;
 import com.oreilly.permitsigns.data.SignType;
-import com.oreilly.permitsigns.interactions.EditSignChoices;
+import com.oreilly.permitsigns.interactions.EditSign;
 
 
 @SuppressWarnings("serial")
@@ -73,7 +75,15 @@ public class Signs {
 	
 	//private final ConversationFactory adminSignCreation = null;
 	
+	// TODO: Timed function to save sign data.
+	
 	public Signs() {
+	}
+	
+	
+	public void saveAll() {
+		for ( String worldName : signsByWorld.keySet() )
+			Config.saveSigns( worldName );
 	}
 	
 	
@@ -83,7 +93,7 @@ public class Signs {
 				.withReturnSequence( "return" )
 				.withTimeout( 20 )
 				.thatExcludesNonPlayersWithMessage( "Only usable from within minecraft, by players" )
-				.withPages( new EditSignChoices() )
+				.withPages( new EditSign() )
 				.withFormatter( new Border() )
 				.withFormatter( new ClearChat() );
 	}
@@ -125,7 +135,7 @@ public class Signs {
 	}
 	
 	
-	public void registerSign( SignRecord sign ) {
+	public void addSign( SignRecord sign ) {
 		// add to signsByLocation
 		String worldName = sign.location.getWorld().getName();
 		ThreeIntHash< SignRecord > threedee = signsByLocation.get( worldName );
@@ -188,6 +198,11 @@ public class Signs {
 	}
 	
 	
+	public void removeSign( SignRecord sign ) {
+		// TODO:
+	}
+	
+	
 	public List< SignRecord > getSignsInWorld( String worldName ) {
 		return signsByWorld.get( worldName );
 	}
@@ -210,16 +225,20 @@ public class Signs {
 			if ( player.isSneaking() ) {
 				if ( permitSign == null ) {
 					permitSign = new SignRecord( block.getLocation() );
-					registerSign( permitSign );
+					addSign( permitSign );
 				}
 				Interaction interaction = editSignInteraction.buildInteraction( player );
 				interaction.context.put( "sign", permitSign );
 				interaction.context.put( "block", block );
 				interaction.begin();
+			} else {
+				playerPurchase( player, block );
 			}
 			return true;
 		}
-		return false;
+		// otherwise, assume the player wants to purchase the permit...
+		playerPurchase( player, block );
+		return true;
 	}
 	
 	
@@ -237,42 +256,43 @@ public class Signs {
 	}
 	
 	
-	public void playerPurchase( Player player, Block block ) {
-		if ( !( block instanceof SignRecord ) )
+	public void playerPurchase( Player player, BlockState block ) {
+		SignRecord signRecord = getSignAtLocation( block.getLocation() );
+		if ( signRecord == null )
 			return;
-		org.bukkit.block.Sign sign = (org.bukkit.block.Sign)block;
-		String[] lines = sign.getLines();
-		String header = lines[0].toLowerCase().trim();
-		if ( signHeaders.containsKey( header ) ) {
-			SignHeader signHeader = signHeaders.get( header );
-			if ( signHeader.type == SignType.SALE ) {
-				if ( PermitMe.instance.players.hasPermission( player, "exempt" ) )
+		PermitPlayer permitPlayer = PermitMe.instance.players.getPlayer( player.getName() );
+		if ( permitPlayer.permits.contains( signRecord.permitAlias ) )
+			return;
+		// DEBUG:
+		PermitMe.log.info( "[PermitSigns] DEBUG: Player " + player.getDisplayName() + " right clicked sign:\n" +
+				signRecord.toHumanString() );
+		switch ( signRecord.signType ) {
+			case SALE: {
+				// if they already have it, let them know, and return...
+				if ( permitPlayer.permits.contains( signRecord.permitAlias ) ) {
+					player.sendMessage( "You have already obtained this" );
 					return;
-				else {
-					Location location = sign.getLocation();
-					SignRecord permitSign = getSignAtLocation( location );
-					if ( permitSign != null ) {
-						PermitPlayer permitPlayer = PermitMe.instance.players.getPlayer( player.getName() );
-						if ( permitPlayer.permits.contains( permitSign.permitAlias ) )
-							return;
-						else {
-							double balance = PermitSigns.instance.prices.checkPlayerBalance( player.getName() );
-							double price = PermitSigns.instance.prices.getPrice( permitSign.permitAlias );
-							if ( balance < price ) {
-								player.sendMessage( "You don't have enough money to purchase this" );
-								return;
-							} else {
-								if ( PermitMe.instance.addPermitToPlayer( player.getName(), permitSign.permitAlias ) ) {
-									if ( !PermitSigns.instance.prices.takeMoneyFromPlayer( player.getName(), price ) )
-										PermitMe.instance.removePermitFromPlayer( player.getName(),
-												permitSign.permitAlias );
-								}
-							}
-						}
-					} else
-						PermitMe.log.warning( "[PermitSigns] The sign in " + location.getWorld().getName() + " at x"
-								+ location.getBlockX() + " y" + location.getBlockY() + " z" + location.getBlockZ()
-								+ " has a PermitSign header, but no associated data" );
+				}
+				// otherwise, check the money.
+				double balance = PermitSigns.instance.prices.checkPlayerBalance( player.getName() );
+				double price = PermitSigns.instance.prices.getPrice( signRecord.permitAlias );
+				if ( balance < price ) {
+					player.sendMessage( "You don't have enough money to purchase this" );
+					return;
+				}
+				// attempt the purchase
+				if ( PermitMe.instance.addPermitToPlayer( player.getName(), signRecord.permitAlias ) ) {
+					// adding the permit was a success...
+					if ( !PermitSigns.instance.prices.takeMoneyFromPlayer( player.getName(), price ) ) {
+						// but if taking the money wasn't (for some reason), then take the permit away again.
+						PermitMe.instance.removePermitFromPlayer( player.getName(),
+								signRecord.permitAlias );
+						player.sendMessage( "Your money is unavaiable" );
+					}
+					else {
+						Permit permit = PermitMe.instance.permits.permitsByAlias.get( signRecord.permitAlias );
+						player.sendMessage( "You have obtained " + WordUtils.capitalize( permit.name ) + "!" );
+					}
 				}
 			}
 		}
@@ -402,5 +422,30 @@ public class Signs {
 		if ( onedee == null )
 			return null;
 		return onedee.get( location.getBlockZ() );
+	}
+	
+	
+	// internal functions to be called by SignRecord
+	
+	void _internalSignRecordUpdatedAlias( SignRecord sign, String oldAlias, String newAlias ) {
+		SignList list = signsByPermitAlias.get( oldAlias );
+		if ( list != null )
+			list.remove( sign );
+		list = signsByPermitAlias.get( newAlias );
+		if ( list == null ) {
+			list = new SignList();
+			signsByPermitAlias.put( newAlias, list );
+		}
+		list.add( sign );
+	}
+	
+	
+	void _internalSignRecordUpdatedLocation( SignRecord sign, Location oldLocation, Location newLocation ) {
+		// TODO:
+	}
+	
+	
+	void _internalSignRecordUpdatedSignType( SignRecord sign, SignType oldType, SignType newType ) {
+		// TODO:
 	}
 }

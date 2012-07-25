@@ -8,21 +8,22 @@ import com.oreilly.common.interaction.text.validator.DoubleValidator;
 import com.oreilly.permitsigns.interactions.pricing.helpers.PriceDataRetriever;
 
 
-public class EditMaxPrice extends TitledInteractionPage {
+public class EditTimeAmount extends TitledInteractionPage {
 	
-	public EditMaxPrice() {
+	public EditTimeAmount() {
 		super();
+		defaultTitle = "Edit Time Based Price Ajustment";
 		withValidator( new DoubleValidator() );
-		defaultTitle = "Edit Max Price";
 	}
 	
 	
 	@Override
 	public String getDisplayText( Interaction interaction ) throws ContextDataRequired, GeneralDisplayError {
 		PriceDataRetriever helper = new PriceDataRetriever( interaction );
-		return "The current maximum price for " + helper.currentPriceAlias + " is " +
-				helper.currentPriceRecord.getMaxPrice() + ".\n" +
-				"Please enter a new value, or \'exit\' to quit";
+		return "Currently, " + helper.currentPriceRecord.getTimeAmount() + " is added / removed,\n" +
+				"every " + helper.currentPriceRecord.getTimeAmountInterval() +
+				"ticks (" + helper.currentPriceRecord.getTimeAmountInterval() / 20 + " seconds)\n" +
+				"What would you like the amount to?";
 	}
 	
 	
@@ -30,10 +31,10 @@ public class EditMaxPrice extends TitledInteractionPage {
 	public String acceptValidatedInput( Interaction interaction, Object data ) throws ContextDataRequired,
 			GeneralDisplayError {
 		PriceDataRetriever helper = new PriceDataRetriever( interaction );
-		// change the value - safe cast, due to validator
-		Double newPrice = (Double)data;
-		helper.currentPriceRecord.setMaxPrice( newPrice );
-		return "Maximum price for " + helper.currentPriceAlias + " is now " + newPrice;
+		// change the value (safe type cast, due to validator)
+		Double newValue = (Double)data;
+		helper.currentPriceRecord.setTimeAmount( newValue );
+		return "The amount the prices changes by is now " + newValue;
 	}
 	
 }

@@ -4,25 +4,27 @@ import com.oreilly.common.interaction.text.Interaction;
 import com.oreilly.common.interaction.text.TitledInteractionPage;
 import com.oreilly.common.interaction.text.error.ContextDataRequired;
 import com.oreilly.common.interaction.text.error.GeneralDisplayError;
-import com.oreilly.common.interaction.text.validator.DoubleValidator;
+import com.oreilly.common.interaction.text.validator.IntValidator;
 import com.oreilly.permitsigns.interactions.pricing.helpers.PriceDataRetriever;
 
 
-public class EditRounding extends TitledInteractionPage {
+public class EditTimeFactorInterval extends TitledInteractionPage {
 	
-	public EditRounding() {
+	public EditTimeFactorInterval() {
 		super();
-		withValidator( new DoubleValidator() );
-		defaultTitle = "Edit Rounding Factor";
+		withValidator( new IntValidator() );
+		defaultTitle = "Edit Price Adjustment Frequency";
 	}
 	
 	
 	@Override
 	public String getDisplayText( Interaction interaction ) throws ContextDataRequired, GeneralDisplayError {
 		PriceDataRetriever helper = new PriceDataRetriever( interaction );
-		return "Prices for " + helper.currentPriceAlias + " are currently rounded to the nearest " +
-				helper.currentPriceRecord.getRounding() + ".\n" +
-				"Please enter a new value, or \'exit\' to quit";
+		return "Currently the price is multiplied by " + helper.currentPriceRecord.getTimeFactor() + "\n" +
+				"every " + helper.currentPriceRecord.getTimeAmountInterval() + "ticks (" +
+				helper.currentPriceRecord.getTimeAmountInterval() / 20 + " seconds)\n" +
+				"Some common ticks values are:\n" + EditVariablePricing.COMMON_TICK_COUNTS +
+				"What would you like to change the frequency to? (In ticks)";
 	}
 	
 	
@@ -31,9 +33,9 @@ public class EditRounding extends TitledInteractionPage {
 			GeneralDisplayError {
 		PriceDataRetriever helper = new PriceDataRetriever( interaction );
 		// change the value (safe type cast, due to validator)
-		Double newValue = (Double)data;
-		helper.currentPriceRecord.setRounding( newValue );
-		return "Prices for " + helper.currentPriceAlias + " will now be rounded to the nearest " + newValue;
+		Integer newValue = (Integer)data;
+		helper.currentPriceRecord.setTimeFactorInterval( newValue );
+		return "The amount will now be updated every " + newValue + " ticks";
 	}
 	
 }

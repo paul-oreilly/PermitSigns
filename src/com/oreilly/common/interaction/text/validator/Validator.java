@@ -1,8 +1,8 @@
 package com.oreilly.common.interaction.text.validator;
 
 import com.oreilly.common.interaction.text.InteractionPage;
-import com.oreilly.common.interaction.text.validator.error.InterfaceDependencyError;
-import com.oreilly.common.interaction.text.validator.error.ValidationFailedError;
+import com.oreilly.common.interaction.text.error.InterfaceDependencyError;
+import com.oreilly.common.interaction.text.error.ValidationFailedError;
 
 
 abstract public class Validator {
@@ -21,15 +21,16 @@ abstract public class Validator {
 	}
 	
 	
-	public void startValidation( Object object, InteractionPage page ) throws ValidationFailedError,
+	public Object startValidation( Object object, InteractionPage page ) throws ValidationFailedError,
 			InterfaceDependencyError {
-		validate( object, page );
+		object = validate( object, page );
 		if ( nextInChain != null )
-			nextInChain.startValidation( object, page );
+			object = nextInChain.startValidation( object, page );
+		return object;
 	}
 	
 	
-	abstract protected void validate( Object object, InteractionPage page ) throws ValidationFailedError,
+	abstract protected Object validate( Object object, InteractionPage page ) throws ValidationFailedError,
 			InterfaceDependencyError;
 	
 }

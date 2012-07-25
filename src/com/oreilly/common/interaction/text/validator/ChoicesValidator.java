@@ -5,20 +5,20 @@ import java.util.HashSet;
 import org.apache.commons.lang.StringUtils;
 
 import com.oreilly.common.interaction.text.InteractionPage;
+import com.oreilly.common.interaction.text.error.InterfaceDependencyError;
+import com.oreilly.common.interaction.text.error.ValidationFailedError;
 import com.oreilly.common.interaction.text.interfaces.Choices;
-import com.oreilly.common.interaction.text.validator.error.InterfaceDependencyError;
-import com.oreilly.common.interaction.text.validator.error.ValidationFailedError;
 
 
 public class ChoicesValidator extends Validator {
 	
 	@Override
-	protected void validate( Object object, InteractionPage page ) throws ValidationFailedError,
+	protected Object validate( Object object, InteractionPage page ) throws ValidationFailedError,
 			InterfaceDependencyError {
 		if ( page instanceof Choices ) {
 			HashSet< String > choiceList = ( (Choices)page ).getChoices();
 			if ( choiceList.contains( object ) )
-				return;
+				return object;
 			throw new ValidationFailedError( this, "Input must be one of: " + StringUtils.join( choiceList, ", " ) );
 		}
 		else

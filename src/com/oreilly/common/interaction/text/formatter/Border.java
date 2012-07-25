@@ -24,6 +24,10 @@ public class Border extends Formatter {
 	static public final String COLOR_TITLE_BORDER = "border_color_title_outline";
 	static public final String COLOR_TITLE_TEXT = "border_color_title_text";
 	
+	enum LineType {
+		TITLE_TOP, TITLE_BOTTOM, TEXT_TOP, TEXT_BOTTOM
+	}
+	
 	
 	public Border() {
 	}
@@ -125,9 +129,4 @@ public class Border extends Formatter {
 				rightCorner + "\n";
 	}
 	
-}
-
-
-enum LineType {
-	TITLE_TOP, TITLE_BOTTOM, TEXT_TOP, TEXT_BOTTOM
 }

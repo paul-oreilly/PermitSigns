@@ -19,11 +19,11 @@ public class SignRecord {
 	static private int nextFileUID = 1;
 	static private HashSet< String > takenUIDs = new HashSet< String >();
 	
-	public String permitAlias = null;
-	public SignType signType = SignType.UNDEFINED;
-	public Location location = null;
-	public String fileUID = null;
-	public SignHeader signHeader = null;
+	String permitAlias = null;
+	SignType signType = SignType.UNDEFINED;
+	Location location = null;
+	String fileUID = null;
+	SignHeader signHeader = null;
 	
 	
 	static public SignRecord fromConfigurationSection( ConfigurationSection section, String UID, String errorLocation ) {
@@ -113,6 +113,56 @@ public class SignRecord {
 			result[1] = wraped[1];
 		}
 		return result;
+	}
+	
+	
+	// data access...
+	
+	public String getPermitAlias() {
+		return permitAlias;
+	}
+	
+	
+	public void setPermitAlias( String alias ) {
+		PermitSigns.instance.signs._internalSignRecordUpdatedAlias( this, permitAlias, alias );
+		permitAlias = alias;
+		PermitSigns.instance.signs.refresh( this );
+	}
+	
+	
+	public SignType getSignType() {
+		return signType;
+	}
+	
+	
+	public void setSignType( SignType type ) {
+		PermitSigns.instance.signs._internalSignRecordUpdatedSignType( this, signType, type );
+		signType = type;
+		PermitSigns.instance.signs.refresh( this );
+	}
+	
+	
+	public Location getLocation() {
+		return location;
+	}
+	
+	
+	public void setLocation( Location newLocation ) {
+		PermitSigns.instance.signs._internalSignRecordUpdatedLocation( this, location, newLocation );
+		location = newLocation;
+	}
+	
+	
+	public SignHeader getSignHeader() {
+		return signHeader;
+	}
+	
+	
+	public void setSignHeader( SignHeader newSignHeader ) {
+		if ( newSignHeader.type != signType )
+			setSignType( newSignHeader.type );
+		signHeader = newSignHeader;
+		PermitSigns.instance.signs.refresh( this );
 	}
 	
 }

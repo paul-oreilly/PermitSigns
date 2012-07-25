@@ -1,4 +1,4 @@
-package com.oreilly.common.interaction.text.validator.error;
+package com.oreilly.common.interaction.text.error;
 
 public class InterfaceDependencyError extends Exception {
 	
@@ -8,5 +8,7 @@ public class InterfaceDependencyError extends Exception {
 	
 	public InterfaceDependencyError( String interfaceRequired ) {
 		this.interfaceRequired = interfaceRequired;
+		// DEBUG:
+		System.out.println( "com.oreilly.common ERROR: Interface dependency error for " + interfaceRequired );
 	}
 }

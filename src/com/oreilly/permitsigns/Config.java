@@ -41,9 +41,8 @@ public class Config {
 	}
 	
 	
-	public static void saveSign( SignRecord sign ) {
+	public static void saveSigns( String worldName ) {
 		// signs are saved as a list in "[worldname]_signs.yml"
-		String worldName = sign.location.getWorld().getName();
 		
 		File source = new File( signFolder + File.separator + worldName + "_signs.yml" );
 		YamlConfiguration config = loadYamlFile( source );
@@ -51,14 +50,14 @@ public class Config {
 		List< SignRecord > signsInWorld = PermitSigns.instance.signs.getSignsInWorld( worldName );
 		for ( SignRecord subject : signsInWorld ) {
 			String key = null;
-			if ( sign.fileUID != null )
-				if ( sign.fileUID.length() > 0 )
-					key = sign.fileUID;
+			if ( subject.fileUID != null )
+				if ( subject.fileUID.length() > 0 )
+					key = subject.fileUID;
 			if ( key == null )
 				key = subject.location.getBlockX() + "-" +
 						subject.location.getBlockY() + "-" +
 						subject.location.getBlockZ();
-			sign.saveToConfig( config, key );
+			subject.saveToConfig( config, key );
 		}
 		
 		try {
@@ -134,7 +133,7 @@ public class Config {
 								config.getConfigurationSection( fileUID ), fileUID,
 								file.getAbsolutePath() );
 						if ( sign != null )
-							PermitSigns.instance.signs.registerSign( sign );
+							PermitSigns.instance.signs.addSign( sign );
 					}
 				}
 		}
@@ -159,7 +158,7 @@ public class Config {
 					PriceRecord data = PriceRecord.fromConfigurationSection(
 							config.getConfigurationSection( "economicData" ), file.getAbsoluteFile().getAbsolutePath() );
 					if ( data != null ) {
-						PermitSigns.instance.prices.addEconomicData( data );
+						PermitSigns.instance.prices.addPriceRecord( data );
 					}
 				}
 		}

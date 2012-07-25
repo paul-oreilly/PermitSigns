@@ -3,11 +3,13 @@ package com.oreilly.permitsigns.interactions;
 import com.oreilly.common.interaction.text.Interaction;
 import com.oreilly.common.interaction.text.pages.MenuPage;
 import com.oreilly.permitsigns.SignRecord;
+import com.oreilly.permitsigns.interactions.signEditor.EditSignAlias;
+import com.oreilly.permitsigns.interactions.signEditor.EditSignType;
 
 
-public class EditSignChoices extends MenuPage {
+public class EditSign extends MenuPage {
 	
-	public EditSignChoices() {
+	public EditSign() {
 		super();
 		withChoice( "type", new EditSignType() );
 		withChoice( "alias", new EditSignAlias() );
@@ -24,7 +26,7 @@ public class EditSignChoices extends MenuPage {
 		SignRecord sign = (SignRecord)interaction.context.get( "sign" );
 		if ( sign == null )
 			return "Display failed to initialise. No value for sign.";
-		return "This is a " + sign.signType.toHumanString() + ", linked to " + sign.permitAlias + "\n" +
+		return "This is a " + sign.getSignType().toHumanString() + ", linked to " + sign.getPermitAlias() + "\n" +
 				"Which action would you like to take?\n" +
 				"  1. Change the type of sign\n" +
 				"  2. Change the permit alias of the sign (linked permit)";

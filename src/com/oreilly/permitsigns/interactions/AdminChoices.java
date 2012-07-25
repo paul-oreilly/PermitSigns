@@ -2,6 +2,8 @@ package com.oreilly.permitsigns.interactions;
 
 import com.oreilly.common.interaction.text.Interaction;
 import com.oreilly.common.interaction.text.pages.MenuPage;
+import com.oreilly.permitsigns.interactions.pricing.SelectPriceData;
+import com.oreilly.permitsigns.interactions.pricing.ViewPriceData;
 
 
 public class AdminChoices extends MenuPage {
@@ -10,7 +12,7 @@ public class AdminChoices extends MenuPage {
 		// TODO: Extend "WithChoice" to take a chain - so can "SelectEconomicData" then "EditEconomicData"
 		// TODO: Add "view economic data", with "SelectEconomicData" then "ViewEconomicData"
 		super();
-		withChoice( "price", new SelectPermitAlias(), new ViewEconomicData() );
+		withChoice( "price", new SelectPriceData(), new ViewPriceData() );
 		withAlias( "price", "1" );
 		withAlias( "price", "permit" );
 		validationFailedMessage = "Please type one of the highlighted options to proceed";

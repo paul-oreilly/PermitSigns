@@ -27,10 +27,10 @@ public class EconomicRatio {
 	}
 	
 	
-	public EconomicRatio( String alias, int x, int y ) {
+	public EconomicRatio( String alias, int sourceCount, int otherCount ) {
 		this.otherAlias = alias;
-		this.sourceCount = y;
-		this.otherCount = x;
+		this.sourceCount = sourceCount;
+		this.otherCount = otherCount;
 	}
 	
 	

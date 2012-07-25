@@ -1,4 +1,4 @@
-package com.oreilly.permitsigns.interactions;
+package com.oreilly.permitsigns.interactions.signEditor;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -7,12 +7,13 @@ import com.oreilly.common.interaction.text.Interaction;
 import com.oreilly.common.interaction.text.TitledInteractionPage;
 import com.oreilly.common.interaction.text.formatter.Highlighter;
 import com.oreilly.common.interaction.text.interfaces.HighlightClient;
-import com.oreilly.permitsigns.Config;
 import com.oreilly.permitsigns.PermitSigns;
 import com.oreilly.permitsigns.SignRecord;
 import com.oreilly.permitsigns.data.SignHeader;
 import com.oreilly.permitsigns.interactions.validators.ValidSignType;
 
+
+// TODO: Update this class - refactor.
 
 public class EditSignType extends TitledInteractionPage implements HighlightClient {
 	
@@ -31,7 +32,7 @@ public class EditSignType extends TitledInteractionPage implements HighlightClie
 		org.bukkit.block.Sign blockSign = (org.bukkit.block.Sign)interaction.context.get( "block" );
 		HashMap< String, SignHeader > signHeaders = PermitSigns.instance.signs.signHeaders;
 		String display = "The current header is " + blockSign.getLines()[0] +
-				"\n(" + sign.signType.toHumanString() + ")\n" +
+				"\n(" + sign.getSignType().toHumanString() + ")\n" +
 				"Header choices are:\n";
 		for ( String key : signHeaders.keySet() ) {
 			SignHeader header = signHeaders.get( key );
@@ -56,11 +57,9 @@ public class EditSignType extends TitledInteractionPage implements HighlightClie
 			interaction.pageWaitingForInput = true;
 			return "The sign header information for " + s + " is invalid.";
 		}
-		sign.signType = signHeader.type;
-		sign.signHeader = signHeader;
+		sign.setSignHeader( signHeader );
 		PermitSigns.instance.signs.refresh( sign );
-		Config.saveSign( sign );
-		return "Sign type updated to " + sign.signType.toString() + " with display " + s;
+		return "Sign type updated to " + sign.getSignType().toString() + " with display " + s;
 	}
 	
 	

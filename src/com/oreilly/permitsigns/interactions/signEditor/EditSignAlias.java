@@ -1,18 +1,20 @@
-package com.oreilly.permitsigns.interactions;
+package com.oreilly.permitsigns.interactions.signEditor;
 
 import com.oreilly.common.interaction.text.Interaction;
+import com.oreilly.common.interaction.text.error.ContextDataRequired;
+import com.oreilly.common.interaction.text.error.GeneralDisplayError;
 import com.oreilly.permitme.PermitMe;
 import com.oreilly.permitme.record.Permit;
 import com.oreilly.permitsigns.SignRecord;
+import com.oreilly.permitsigns.interactions.SelectPermitAlias;
 
+
+// TODO: REDO this class!
 
 public class EditSignAlias extends SelectPermitAlias {
 	
 	public EditSignAlias() {
 		super();
-		// add ValidPermitAlias to PermitMe, use here.
-		// add validation failed message.
-		
 		defaultTitle = "Edit Sign Alias";
 	}
 	
@@ -25,7 +27,8 @@ public class EditSignAlias extends SelectPermitAlias {
 	
 	
 	@Override
-	public String acceptValidatedInput( Interaction interaction, Object data ) {
+	public String acceptValidatedInput( Interaction interaction, Object data ) throws ContextDataRequired,
+			GeneralDisplayError {
 		String superResult = super.acceptValidatedInput( interaction, data );
 		String permitAlias = interaction.context.get( SelectPermitAlias.CONTEXT_SELECTED_ALIAS ).toString();
 		if ( permitAlias != null ) {
@@ -35,7 +38,7 @@ public class EditSignAlias extends SelectPermitAlias {
 				if ( signObj != null )
 					if ( signObj instanceof SignRecord ) {
 						SignRecord sign = (SignRecord)signObj;
-						sign.permitAlias = permitAlias;
+						sign.setPermitAlias( permitAlias );
 						return "Sign linkage updated to " + permitAlias;
 					}
 			}

@@ -2,6 +2,8 @@ package com.oreilly.common.interaction.text;
 
 import java.util.HashMap;
 
+import com.oreilly.common.interaction.text.error.ContextDataRequired;
+import com.oreilly.common.interaction.text.error.GeneralDisplayError;
 import com.oreilly.common.interaction.text.formatter.Formatter;
 import com.oreilly.common.interaction.text.validator.Validator;
 
@@ -22,11 +24,12 @@ abstract public class InteractionPage {
 	}
 	
 	
-	abstract public String getDisplayText( Interaction interaction );
+	abstract public String getDisplayText( Interaction interaction ) throws ContextDataRequired, GeneralDisplayError;
 	
 	
 	// if a string is returned, it is displayed to the player.
-	abstract public String acceptValidatedInput( Interaction interaction, Object data );
+	abstract public String acceptValidatedInput( Interaction interaction, Object data ) throws ContextDataRequired,
+			GeneralDisplayError;
 	
 	
 	// chained init methods
@@ -78,17 +81,4 @@ abstract public class InteractionPage {
 		return this;
 	}
 	
-	
-	// Helper functions...
-	
-	@SuppressWarnings("unchecked")
-	public < T > T getContextData( Class< T > tClass, Interaction interaction, String key ) {
-		Object obj = interaction.context.get( key );
-		if ( obj == null )
-			return null;
-		if ( obj.getClass().isAssignableFrom( tClass ) )
-			return (T)obj;
-		else
-			return null;
-	}
 }

@@ -21,7 +21,7 @@ public class Prices {
 	private final TreeMap< String, Double > permitPrices = new TreeMap< String, Double >();
 	private final TreeMap< String, String > permitPricesAsStrings = new TreeMap< String, String >();
 	// sorted by permitUUID
-	private final TreeMap< String, PriceRecord > economicData = new TreeMap< String, PriceRecord >();
+	private final TreeMap< String, PriceRecord > priceData = new TreeMap< String, PriceRecord >();
 	private final TreeMap< String, LinkedList< PriceRecord >> dataByRatio = new TreeMap< String, LinkedList< PriceRecord >>();
 	// cached for when ratio data changes
 	private final TreeMap< String, LinkedList< String >> cacheRatioDataLinks = new TreeMap< String, LinkedList< String >>();
@@ -44,9 +44,15 @@ public class Prices {
 	}
 	
 	
-	public void addEconomicData( PriceRecord data ) {
+	public void saveAll() {
+		for ( PriceRecord record : priceData.values() )
+			Config.savePriceData( record );
+	}
+	
+	
+	public void addPriceRecord( PriceRecord data ) {
 		// TODO: Error checking
-		economicData.put( data.permitAlias, data );
+		priceData.put( data.permitAlias, data );
 		if ( data.ratios != null )
 			addRatioRecords( data );
 		updatePrice( data );
@@ -54,12 +60,12 @@ public class Prices {
 	
 	
 	public void scheduledTaskUpdatePrices() {
-		for ( PriceRecord data : economicData.values() ) {
+		for ( PriceRecord data : priceData.values() ) {
 			boolean dataChange = false;
 			// update ratio decay data if required
 			if ( data.timeFactorDefined ) {
 				data.ticksSinceRatioDecayUpdated += scheduleTicksIntervalForTimeAdjustments;
-				if ( data.ticksSinceRatioDecayUpdated > data.timeFactorInterval ) {
+				while ( data.ticksSinceRatioDecayUpdated > data.timeFactorInterval ) {
 					data.ticksSinceRatioDecayUpdated -= data.timeFactorInterval;
 					data.variablePrice *= data.timeFactor;
 					dataChange = true;
@@ -68,9 +74,9 @@ public class Prices {
 			// update fixed decay data if required
 			if ( data.timeAmountDefined ) {
 				data.ticksSinceTimeDecayUpdated += scheduleTicksIntervalForTimeAdjustments;
-				if ( data.ticksSinceTimeDecayUpdated > data.timeAmountInterval ) {
+				while ( data.ticksSinceTimeDecayUpdated > data.timeAmountInterval ) {
 					data.ticksSinceTimeDecayUpdated -= data.timeAmountInterval;
-					data.variablePrice -= data.timeAmount;
+					data.variablePrice += data.timeAmount;
 					dataChange = true;
 				}
 			}
@@ -115,6 +121,8 @@ public class Prices {
 		} else {
 			addRatioRecords( data );
 		}
+		// update other information
+		priceRecordChange( data );
 	}
 	
 	
@@ -149,12 +157,12 @@ public class Prices {
 	
 	
 	public TreeMap< String, PriceRecord > getEconomicData() {
-		return economicData;
+		return priceData;
 	}
 	
 	
 	public PriceRecord getPriceRecord( String permitAlias ) {
-		PriceRecord result = economicData.get( permitAlias );
+		PriceRecord result = priceData.get( permitAlias );
 		if ( result != null )
 			return result;
 		else {
@@ -165,7 +173,7 @@ public class Prices {
 			else {
 				// make a default economic data, and use that
 				result = new PriceRecord( permitAlias, 10000 );
-				addEconomicData( result );
+				addPriceRecord( result );
 				return result;
 			}
 		}
@@ -173,7 +181,7 @@ public class Prices {
 	
 	
 	public void playerGainedPermit( PermitPlayer player, String permitAlias ) {
-		PriceRecord data = economicData.get( permitAlias );
+		PriceRecord data = priceData.get( permitAlias );
 		if ( data.purchaseFactorDefined )
 			data.variablePrice *= data.purchaseFactor;
 		if ( data.purchaseAmountDefined )
@@ -184,7 +192,7 @@ public class Prices {
 	
 	
 	public void playerLostPermit( PermitPlayer player, String permitAlias ) {
-		PriceRecord data = economicData.get( permitAlias );
+		PriceRecord data = priceData.get( permitAlias );
 		updateRatios( data );
 		updatePrice( permitAlias );
 	}
@@ -227,8 +235,11 @@ public class Prices {
 	
 	public boolean takeMoneyFromPlayer( String playerName, double amount ) {
 		net.milkbowl.vault.economy.Economy vaultEconomy = PermitSigns.instance.vaultEconomy;
-		if ( vaultEconomy == null )
+		if ( vaultEconomy == null ) {
+			PermitMe.log.warning( "[PermitSigns] No access to vault for economic API, therefore cannot remove " +
+					amount + " from player" );
 			return false;
+		}
 		else {
 			EconomyResponse response = vaultEconomy.withdrawPlayer( playerName, amount );
 			return response.transactionSuccess();
@@ -237,6 +248,8 @@ public class Prices {
 	
 	
 	protected void priceRecordChange( PriceRecord record ) {
+		// DEBUG:
+		PermitMe.log.info( "[PermitSigns] DEBUG: Updating price record for " + record.permitAlias );
 		// TODO.. add to timing functions, etc etc.
 		updatePrice( record );
 		Config.savePriceData( record );
@@ -249,10 +262,10 @@ public class Prices {
 	
 	
 	protected boolean updatePrice( String permitAlias, boolean forceSave ) {
-		PriceRecord data = economicData.get( permitAlias );
+		PriceRecord data = priceData.get( permitAlias );
 		if ( data == null ) {
 			data = new PriceRecord( permitAlias, 10000 );
-			economicData.put( permitAlias, data );
+			priceData.put( permitAlias, data );
 			Config.savePriceData( data );
 		}
 		return updatePrice( data, forceSave );
@@ -265,25 +278,40 @@ public class Prices {
 	
 	
 	protected boolean updatePrice( PriceRecord data, boolean forceSave ) {
-		double result;
-		boolean dynamicPriceDefined = ( data.purchaseFactorDefined | data.timeFactorDefined | data.timeAmountDefined );
+		double result = 1000000; // just in case it remains unassigend, an error should be obvious!
+		boolean variablePriceDefined = data.getVariablePriceDefined();
 		// if only a base price is defined, then the price is the base price...
-		if ( !( data.ratioDefined | dynamicPriceDefined ) ) {
-			result = roundToFactor( data.basePrice, data.roundingFactor );
+		if ( !( data.ratioDefined | variablePriceDefined ) ) {
+			result = data.basePrice;
 		} else {
-			if ( data.ratioDefined & dynamicPriceDefined )
-				result = Math.max( data.ratioPrice, data.currentPrice );
-			else if ( data.ratioDefined )
-				result = data.ratioPrice;
-			else
-				result = data.currentPrice;
-			if ( data.maxPriceDefined )
-				result = Math.min( result, data.maxPrice );
-			if ( data.minPriceDefined )
-				result = Math.max( result, data.minPrice );
-			result = roundToFactor( result, data.roundingFactor );
+			// for each price, do a range check..
+			boolean resultAssigned = false;
+			if ( data.ratioDefined ) {
+				data.ratioPrice = ( data.ratioPrice > data.maxPrice ) ? data.maxPrice : data.ratioPrice;
+				data.ratioPrice = ( data.ratioPrice < data.minPrice ) ? data.minPrice : data.ratioPrice;
+				// if only ratio's exist, we have our result.
+				if ( !variablePriceDefined ) {
+					result = data.ratioPrice;
+					resultAssigned = true;
+				}
+			}
+			if ( variablePriceDefined ) {
+				data.variablePrice = ( data.variablePrice > data.maxPrice ) ? data.maxPrice : data.variablePrice;
+				data.variablePrice = ( data.variablePrice < data.minPrice ) ? data.minPrice : data.variablePrice;
+				// if only variable prices exist, we have a result
+				if ( !data.ratioDefined ) {
+					result = data.variablePrice;
+					resultAssigned = true;
+				}
+			}
+			// some combination of enabled prices exists, pick the top one
+			if ( resultAssigned == false )
+				result = Math.max( data.ratioPrice, data.variablePrice );
 		}
-		if ( result != data.currentPrice ) {
+		// round the result
+		result = roundToFactor( result, data.roundingFactor );
+		// check if the result is significantly different (floating point check)
+		if ( ( result > ( data.currentPrice * 1.00000001 ) ) | ( result < ( data.currentPrice * 0.99999999 ) ) ) {
 			PermitSignsPriceChangeEvent permitSignsEvent = new PermitSignsPriceChangeEvent( data.permitAlias, result,
 					data.currentPrice );
 			PermitSigns.instance.getServer().getPluginManager().callEvent( permitSignsEvent );

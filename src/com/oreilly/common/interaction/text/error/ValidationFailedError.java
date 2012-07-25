@@ -1,4 +1,4 @@
-package com.oreilly.common.interaction.text.validator.error;
+package com.oreilly.common.interaction.text.error;
 
 import com.oreilly.common.interaction.text.validator.Validator;
 
