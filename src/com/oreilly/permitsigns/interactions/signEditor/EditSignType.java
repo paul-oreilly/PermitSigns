@@ -1,12 +1,11 @@
 package com.oreilly.permitsigns.interactions.signEditor;
 
 import java.util.HashMap;
-import java.util.Iterator;
 
 import com.oreilly.common.interaction.text.Interaction;
+import com.oreilly.common.interaction.text.StyleConstants;
 import com.oreilly.common.interaction.text.TitledInteractionPage;
-import com.oreilly.common.interaction.text.formatter.Highlighter;
-import com.oreilly.common.interaction.text.interfaces.HighlightClient;
+import com.oreilly.common.interaction.text.formatter.Highlight;
 import com.oreilly.permitsigns.PermitSigns;
 import com.oreilly.permitsigns.SignRecord;
 import com.oreilly.permitsigns.data.SignHeader;
@@ -15,14 +14,18 @@ import com.oreilly.permitsigns.interactions.validators.ValidSignType;
 
 // TODO: Update this class - refactor.
 
-public class EditSignType extends TitledInteractionPage implements HighlightClient {
+public class EditSignType extends TitledInteractionPage {
 	
 	public EditSignType() {
 		super();
-		withFormatter( new Highlighter( this ) );
 		withValidator( new ValidSignType() );
 		validationFailedMessage = "Unable to find a valid header based on %input";
 		defaultTitle = "Edit Sign Type";
+	}
+	
+	
+	private String valid( String input ) {
+		return Highlight.HighlightAs( StyleConstants.VALID_INPUT, input );
 	}
 	
 	
@@ -36,7 +39,7 @@ public class EditSignType extends TitledInteractionPage implements HighlightClie
 				"Header choices are:\n";
 		for ( String key : signHeaders.keySet() ) {
 			SignHeader header = signHeaders.get( key );
-			display += "  " + header.headerText + " (" + header.type.toHumanString() + ")\n";
+			display += "  " + valid( header.headerText ) + " (" + header.type.toHumanString() + ")\n";
 		}
 		display += "Please enter the choice you wish to change the sign to:";
 		return display;
@@ -60,13 +63,5 @@ public class EditSignType extends TitledInteractionPage implements HighlightClie
 		sign.setSignHeader( signHeader );
 		PermitSigns.instance.signs.refresh( sign );
 		return "Sign type updated to " + sign.getSignType().toString() + " with display " + s;
-	}
-	
-	
-	@Override
-	public HashMap< String, Iterator< String >> getHighlightList() {
-		HashMap< String, Iterator< String >> result = new HashMap< String, Iterator< String >>();
-		result.put( Highlighter.PLAYER_CHOICES, PermitSigns.instance.signs.signHeaders.keySet().iterator() );
-		return result;
 	}
 }

@@ -4,6 +4,7 @@ import com.oreilly.common.interaction.text.Interaction;
 import com.oreilly.common.interaction.text.error.ContextDataRequired;
 import com.oreilly.common.interaction.text.error.GeneralDisplayError;
 import com.oreilly.common.interaction.text.pages.MenuPage;
+import com.oreilly.permitsigns.interactions.Style;
 import com.oreilly.permitsigns.interactions.pricing.helpers.RatioDataRetriever;
 
 
@@ -31,10 +32,10 @@ public class EditPriceRatio extends MenuPage {
 				helper.currentRatio.otherAlias + "\n" +
 				"([source]:[other] of alias)\n" +
 				"Please select an action:\n" +
-				"1. Return to the list of price ratio's\n" +
-				"2. Edit the ratio's source count\n" +
-				"3. Edit the ratio's other count\n" +
-				"4. Edit the alias the ratio linked to\n";
+				Style.valid( "1" ) + ". Return to the list of price ratio's\n" +
+				Style.valid( "2" ) + ". Edit the ratio's source count\n" +
+				Style.valid( "3" ) + ". Edit the ratio's other count\n" +
+				Style.valid( "4" ) + ". Edit the alias the ratio linked to\n";
 	}
 	
 }

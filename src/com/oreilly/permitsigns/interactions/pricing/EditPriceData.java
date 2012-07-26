@@ -4,6 +4,7 @@ import com.oreilly.common.interaction.text.Interaction;
 import com.oreilly.common.interaction.text.error.ContextDataRequired;
 import com.oreilly.common.interaction.text.error.GeneralDisplayError;
 import com.oreilly.common.interaction.text.pages.MenuPage;
+import com.oreilly.permitsigns.interactions.Style;
 import com.oreilly.permitsigns.interactions.pricing.helpers.PriceDataRetriever;
 
 
@@ -37,14 +38,14 @@ public class EditPriceData extends MenuPage {
 	public String getDisplayText( Interaction interaction ) throws ContextDataRequired, GeneralDisplayError {
 		PriceDataRetriever helper = new PriceDataRetriever( interaction );
 		return "Currently editing prices for " + helper.currentPriceAlias + ":\n\n" +
-				"Please select an option (or exit to quit)\n" +
-				"(type \'view\' to see the current settings)\n" +
-				"1. Base price\n" +
-				"2. Minimum price\n" +
-				"3. Maximum price\n" +
-				"4. Rounding factor\n" +
-				"5. Variable price settings\n" +
-				"6. Ratio price settings";
+				"Please select an option (or " + Style.valid( "exit" ) + " to quit)\n" +
+				"(type " + Style.valid( "view" ) + " to see the current settings)\n" +
+				Style.valid( "1" ) + ". " + Style.valid( "Base" ) + " price\n" +
+				Style.valid( "2" ) + ". " + Style.valid( "Minimum" ) + " price\n" +
+				Style.valid( "3" ) + ". " + Style.valid( "Maximum" ) + " price\n" +
+				Style.valid( "4" ) + ". " + Style.valid( "Rounding" ) + " factor\n" +
+				Style.valid( "5" ) + ". " + Style.valid( "Variable" ) + " price settings\n" +
+				Style.valid( "6" ) + ". " + Style.valid( "Ratio" ) + " price settings";
 	}
 	
 }

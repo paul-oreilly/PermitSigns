@@ -26,7 +26,7 @@ public class AdminChoices extends MenuPage {
 	public String getDisplayText( Interaction interaction ) {
 		return "Which action would you like to take?\n" +
 				"(To edit sign data, hold sneak while right clicking the sign)\n" +
-				"  1. View / edit the price of a permit\n";
-		
+				"  " + Style.valid( "1" ) + ". View / edit the " + Style.valid( "price" ) +
+				" of a permit\n";
 	}
 }

@@ -11,6 +11,7 @@ import com.oreilly.common.interaction.text.error.ContextDataRequired;
 import com.oreilly.common.interaction.text.error.GeneralDisplayError;
 import com.oreilly.permitsigns.PriceRecord;
 import com.oreilly.permitsigns.data.EconomicRatio;
+import com.oreilly.permitsigns.interactions.Style;
 import com.oreilly.permitsigns.interactions.pricing.helpers.PriceDataRetriever;
 
 
@@ -37,12 +38,14 @@ public class EditRatioPricing extends TitledInteractionPage {
 				pa = new PaginationAssistant(
 						"No pricing ratio's are currently defined for " + helper.currentPriceAlias + "\n" +
 								"You have only significant choice:\n" +
-								"Type \'new\' to add a pricing ratio", InteractionPage.MAX_LINES - 4, "" );
+								"Type " + Style.valid( "new" ) + " to add a pricing ratio",
+						InteractionPage.MAX_LINES - 4, "" );
 			} else {
 				String ratioList = generateRatioList( helper.currentPriceRecord, interaction );
 				pa = new PaginationAssistant( ratioList, InteractionPage.MAX_LINES - 4,
 						"Editing ratio data for " + helper.currentPriceAlias + "\n" +
-								"Type \'new\' to add a pricing ratio, or select a ratio to edit:\n\n" );
+								"Type " + Style.valid( "new" ) + " to add a pricing ratio," +
+								" or select a ratio to edit:\n\n" );
 			}
 			interaction.context.put( PAGINATION, pa );
 		}
@@ -55,7 +58,8 @@ public class EditRatioPricing extends TitledInteractionPage {
 		String result = "";
 		HashMap< String, EconomicRatio > choices = new HashMap< String, EconomicRatio >();
 		for ( EconomicRatio ratio : pricing.getPriceRatios() ) {
-			result += count + ". " + ratio.sourceCount + ":" + ratio.otherCount + " with " + ratio.otherAlias;
+			result += Style.valid( count.toString() ) + ". " + ratio.sourceCount + ":" + ratio.otherCount + " with " +
+					ratio.otherAlias;
 			choices.put( count.toString(), ratio );
 			count += 1;
 		}

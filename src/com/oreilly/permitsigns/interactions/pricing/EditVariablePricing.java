@@ -4,6 +4,7 @@ import com.oreilly.common.interaction.text.Interaction;
 import com.oreilly.common.interaction.text.error.ContextDataRequired;
 import com.oreilly.common.interaction.text.error.GeneralDisplayError;
 import com.oreilly.common.interaction.text.pages.MenuPage;
+import com.oreilly.permitsigns.interactions.Style;
 import com.oreilly.permitsigns.interactions.pricing.helpers.PriceDataRetriever;
 
 
@@ -34,29 +35,29 @@ public class EditVariablePricing extends MenuPage {
 				helper.currentPriceRecord.getVariablePrice() + "\n" +
 				"Please select which option you would like to edit:\n";
 		if ( helper.currentPriceRecord.getPurchaseAmountDefined() )
-			result += "1. Edit the value added / removed on purchase\n" +
+			result += Style.valid( "1" ) + ". Edit the value added / removed on purchase\n" +
 					"    - currently " + helper.currentPriceRecord.getPurchaseAmount() + "\n";
 		else
-			result += "1. Define an amount that will be added / removed on purchase\n";
+			result += Style.valid( "1" ) + ". Define an amount that will be added / removed on purchase\n";
 		if ( helper.currentPriceRecord.getPurchaseFactorDefined() )
-			result += "2. Edit the factor the price is multiplied by on purchase\n" +
-					"    - currently " + helper.currentPriceRecord.getPurchaseFactor() + ")\n";
+			result += Style.valid( "2" ) + ". Edit the factor the price is multiplied by on purchase\n" +
+					"    - currently " + helper.currentPriceRecord.getPurchaseFactor() + "\n";
 		else
-			result += "2. Define a factor for the price to be multiplied by on purchase\n";
+			result += Style.valid( "2" ) + ". Define a factor for the price to be multiplied by on purchase\n";
 		if ( helper.currentPriceRecord.getTimeAmountDefined() )
-			result += "3. Edit the value added / removed over time\n" +
+			result += Style.valid( "3" ) + ". Edit the value added / removed over time\n" +
 					"    - currently " + helper.currentPriceRecord.getTimeAmount() +
 					" every " + helper.currentPriceRecord.getTimeAmountInterval() +
 					" ticks\n";
 		else
-			result += "3. Define a value to be added / removed over time\n";
+			result += Style.valid( "3" ) + ". Define a value to be added / removed over time\n";
 		if ( helper.currentPriceRecord.getTimeFactorDefined() )
-			result += "4. Edit the factor that the price is multiplied by over time\n" +
+			result += Style.valid( "4" ) + ". Edit the factor that the price is multiplied by over time\n" +
 					"    - current " + helper.currentPriceRecord.getTimeFactor() +
 					" every " + helper.currentPriceRecord.getTimeFactorInterval() +
 					" ticks\n";
 		else
-			result += "4. Define a factor that the price will be multipled by over time\n";
+			result += Style.valid( "4" ) + ". Define a factor that the price will be multipled by over time\n";
 		return result;
 	}
 	

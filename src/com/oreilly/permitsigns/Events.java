@@ -9,12 +9,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 
+import com.oreilly.common.text.ColorTool;
 import com.oreilly.permitme.events.PermitMeEnableCompleteEvent;
 import com.oreilly.permitme.events.PermitMePlayerAddPermitEvent;
 import com.oreilly.permitme.events.PermitMePlayerRemovePermitEvent;
@@ -29,6 +31,14 @@ public class Events implements Listener {
 	
 	public Events() {
 		super();
+	}
+	
+	
+	// Debugging  - echo event for testing formatting
+	@EventHandler()
+	public void onPlayerChat( PlayerChatEvent event ) {
+		System.out.println( "DEBUG: Chat event from " + event.getPlayer().getName() );
+		ColorTool.sendToUser( event.getPlayer(), "Echo: " + event.getMessage() );
 	}
 	
 	

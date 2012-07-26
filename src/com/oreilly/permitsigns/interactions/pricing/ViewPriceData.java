@@ -6,6 +6,7 @@ import com.oreilly.common.interaction.text.PaginationAssistant;
 import com.oreilly.common.interaction.text.TitledInteractionPage;
 import com.oreilly.common.interaction.text.error.ContextDataRequired;
 import com.oreilly.common.interaction.text.error.GeneralDisplayError;
+import com.oreilly.permitsigns.interactions.Style;
 import com.oreilly.permitsigns.interactions.pricing.helpers.PriceDataRetriever;
 
 
@@ -16,8 +17,9 @@ public class ViewPriceData extends TitledInteractionPage {
 	
 	protected static final String PAGINATION = "viewPriceData_paginator";
 	
-	// allow 4 for borders, 1 for title, and 2 more for "Page x of y" at the bottom of each page
-	private static final int MAX_LINES = InteractionPage.MAX_LINES - 7;
+	// allow 4 for borders, 1 for title, at the bottom of each page
+	// and allow another line for any feedback from previous screen...
+	private static final int MAX_LINES = InteractionPage.MAX_LINES - 6;
 	
 	
 	public ViewPriceData() {
@@ -34,10 +36,10 @@ public class ViewPriceData extends TitledInteractionPage {
 			return pa.getDisplayText();
 		// otherwise, we need to generate the raw information...
 		PriceDataRetriever helper = new PriceDataRetriever( interaction );
-		pa = new PaginationAssistant( helper.currentPriceRecord.toHumanString(),
+		pa = new PaginationAssistant( helper.currentPriceRecord.toHumanString( false, "" ),
 				MAX_LINES,
-				"Price data for " + helper.currentPriceAlias + "\n" +
-						"(type \'edit\' to make changes)\n\n" );
+				"Price data for " + helper.currentPriceAlias + ". " +
+						"(type " + Style.valid( "edit" ) + " to make changes)\n\n" );
 		interaction.context.put( PAGINATION, pa );
 		return pa.getDisplayText();
 	}
@@ -51,8 +53,12 @@ public class ViewPriceData extends TitledInteractionPage {
 		if ( pa == null )
 			throw new ContextDataRequired( PAGINATION, PaginationAssistant.class );
 		// see if we have a page command....
-		if ( pa.processPageCommand( universal ) )
+		// DEBUG:
+		System.out.println( "Command: " + universal );
+		if ( pa.processPageCommand( universal ) ) {
+			interaction.pageWaitingForInput = true;
 			return null;
+		}
 		// if we are not dealing with page data...
 		// "edit" will pass on to EditSignData
 		if ( universal.contentEquals( "edit" ) ) {

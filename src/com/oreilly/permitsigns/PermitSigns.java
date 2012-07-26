@@ -10,9 +10,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.oreilly.common.interaction.text.Interaction;
 import com.oreilly.common.interaction.text.InteractionFactory;
+import com.oreilly.common.interaction.text.StyleConstants;
 import com.oreilly.common.interaction.text.formatter.Border;
 import com.oreilly.common.interaction.text.formatter.ClearChat;
-import com.oreilly.common.interaction.text.formatter.Highlighter;
+import com.oreilly.common.interaction.text.formatter.Highlight;
 import com.oreilly.permitme.PermitMe;
 import com.oreilly.permitsigns.interactions.AdminChoices;
 
@@ -107,11 +108,12 @@ public class PermitSigns extends JavaPlugin {
 				.withPages( new AdminChoices() )
 				.withFormatter( new Border() )
 				.withFormatter( new ClearChat() )
+				.withFormatter( new Highlight() )
 				.thatExcludesNonPlayersWithMessage( "Only usable from within minecraft, by players" )
-				.withStyle( Highlighter.PLAYER_CHOICES, ChatColor.GREEN )
 				.withStyle( Border.COLOR_TITLE_TEXT, ChatColor.GOLD )
 				.withStyle( Border.COLOR_TITLE_BORDER, ChatColor.DARK_RED )
 				.withStyle( Border.COLOR_TEXT_BORDER, ChatColor.BLUE );
+		Highlight.addHighlightStyle( adminInteraction, StyleConstants.VALID_INPUT, ChatColor.GREEN );
 	}
 	
 	
