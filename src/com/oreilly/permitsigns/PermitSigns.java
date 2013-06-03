@@ -29,6 +29,7 @@ public class PermitSigns extends JavaPlugin {
 	
 	public static PermitSigns instance = null;
 	
+	public Config config = null;
 	public Signs signs = null;
 	public Prices prices = null;
 	public PlayerTracker tracker = null;
@@ -51,6 +52,7 @@ public class PermitSigns extends JavaPlugin {
 		
 		PermitMe.log.info( "[PermitSigns] Enabling..." );
 		
+		config = new Config();
 		signs = new Signs();
 		prices = new com.oreilly.permitsigns.Prices( this );
 		tracker = new PlayerTracker();

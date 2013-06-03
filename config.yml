@@ -1,0 +1,18 @@
+formatting:
+  prices:
+    decimals: ##.##
+    prefix: "$"
+    postfix: ""
+  signs:
+    title:
+      case: uppercase
+      prefix: "["
+      postfix: "]"
+      color: dark_green
+    name:
+      case: captialized
+      prefix: ""
+      postfix: ""
+      color: black
+    price:
+      color: red

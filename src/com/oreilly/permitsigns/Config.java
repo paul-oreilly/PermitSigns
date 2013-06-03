@@ -26,8 +26,61 @@ public class Config {
 	static public File signFolder = null;
 	static public File conf = null;
 	
+	public PermitSigns manager;
+	
+	public String priceFormat = null;
+	public String pricePrefix = null;
+	public String pricePostfix = null;
+	public Captialisation signTitleCase = null;
+	public String signTitlePrefix = null;
+	public String signTitlePostfix = null;
+	public String signTitleColor = null;
+	public Captialisation signNnameCase = null;
+	public String signNamePrefix = null;
+	public String signNamePostfix = null;
+	public String signNameColor = null;
+	public String signPriceColor = null;
+	
+	
+	public Config( PermitSigns manager ) {
+		// load the values from the config.yml into this object
+		manager.saveDefaultConfig();
+		FileConfiguration configFile = manager.getConfig();
+		configFile.options().copyDefaults( true );
+		
+		// pull values, with defaults
+		priceFormat = configFile.getString( "formatting.prices.decimals", "##.##" );
+		pricePrefix = configFile.getString( "formatting.prices.prefix", "$" );
+		pricePostfix = configFile.getString( "formatting.prices.postfix", "" );
+		//signTitleCase
+		signTitlePrefix = configFile.getString( "formatting.signs.tile.prefix", "[" );
+		signTitlePostfix = configFile.getString( "formatting.signs.tile.postfix", "]" );
+		
+	}
+	
+	
+	public String formatPrice( double price ) {
+		
+	}
+	
+	
+	public String formatSignPrice( double price ) {
+		
+	}
+	
+	
+	public String formatSignTitle( String rawTitle ) {
+		
+	}
+	
+	
+	public String formatSignName( String rawName ) {
+		
+	}
+	
 	
 	public static void load() {
+		// initial setup
 		loadFilePaths();
 		
 		// load main config
@@ -93,6 +146,7 @@ public class Config {
 	
 	
 	private static void loadConfig() {
+		
 		// load sign header information
 		FileConfiguration config = loadYamlFile( conf );
 		Signs signs = PermitSigns.instance.signs;
